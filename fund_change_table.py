@@ -5,6 +5,11 @@ Shows percentage change in fund value over various time periods relative to curr
 
 import matplotlib.pyplot as plt
 from fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
+from fund_constants import (
+    HEADER_BG, HEADER_FG, ROW_BG_ODD, ROW_BG_EVEN, TOTAL_BG, TOTAL_FG,
+    BORDER, ROW_FG, GREEN, RED, ROW_HEIGHT, HEADER_HEIGHT, TABLE_TOP, TABLE_LEFT,
+    CELL_PADDING, FONT_SIZE, TITLE_FONT_SIZE, BORDER_WIDTH,
+)
 
 
 def pct_change(current, past) -> str:
@@ -65,34 +70,21 @@ def main():
     col_widths = [0.24, 0.10, 0.07, 0.11, 0.11, 0.11, 0.11, 0.11]
     col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right"]
 
-    row_height = 0.12
-    header_height = 0.14
-    table_top = 0.92
-
-    HEADER_BG   = "#0057a8"
-    HEADER_FG   = "white"
-    ROW_BG_ODD  = "#f5f8fd"
-    ROW_BG_EVEN = "white"
-    TOTAL_BG    = "#dce8f7"
-    BORDER      = "#b0c4de"
-    GREEN       = "#1a7a3a"
-    RED         = "#b22222"
-
     x_positions = []
-    x = 0.03
+    x = TABLE_LEFT
     for w in col_widths:
         x_positions.append(x)
         x += w
 
-    def draw_cell(ax, x, y, w, h, text, bg, fg, align, fontsize=10, bold=False):
+    def draw_cell(ax, x, y, w, h, text, bg, fg, align, fontsize=FONT_SIZE, bold=False):
         rect = plt.Rectangle((x, y), w, h, transform=ax.transAxes,
                               color=bg, zorder=1, clip_on=False,
-                              linewidth=0.8, edgecolor=BORDER)
+                              linewidth=BORDER_WIDTH, edgecolor=BORDER)
         ax.add_patch(rect)
         if align == "left":
-            tx, ha = x + 0.01, "left"
+            tx, ha = x + CELL_PADDING, "left"
         elif align == "right":
-            tx, ha = x + w - 0.01, "right"
+            tx, ha = x + w - CELL_PADDING, "right"
         else:
             tx, ha = x + w / 2, "center"
         ax.text(tx, y + h / 2, text, transform=ax.transAxes,
@@ -105,15 +97,15 @@ def main():
         if is_header:
             bg, base_fg = HEADER_BG, HEADER_FG
         elif is_total:
-            bg, base_fg = TOTAL_BG, "#003d7a"
+            bg, base_fg = TOTAL_BG, TOTAL_FG
         else:
-            bg, base_fg = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), "#1a1a2e"
-        h = header_height if is_header else row_height
+            bg, base_fg = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG
+        h = HEADER_HEIGHT if is_header else ROW_HEIGHT
 
         if row_idx == 0:
-            y = table_top - header_height
+            y = TABLE_TOP - HEADER_HEIGHT
         else:
-            y = table_top - header_height - row_idx * row_height
+            y = TABLE_TOP - HEADER_HEIGHT - row_idx * ROW_HEIGHT
 
         for col_idx in range(n_cols):
             text = row_data[col_idx]
@@ -126,8 +118,8 @@ def main():
                       text, bg, fg, col_aligns[col_idx],
                       fontsize=10, bold=(is_header or is_total))
 
-    fig.suptitle("Fund Portfolio - Percentage Change", fontsize=14, fontweight="bold",
-                 color="#0057a8", y=0.98)
+    fig.suptitle("Fund Portfolio - Percentage Change", fontsize=TITLE_FONT_SIZE, fontweight="bold",
+                 color=HEADER_BG, y=0.98)
 
     plt.tight_layout()
     plt.show()

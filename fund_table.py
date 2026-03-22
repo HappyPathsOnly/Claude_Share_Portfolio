@@ -5,6 +5,11 @@ Displays current fund values in a tabular format.
 
 import matplotlib.pyplot as plt
 from fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
+from fund_constants import (
+    HEADER_BG, HEADER_FG, ROW_BG_ODD, ROW_BG_EVEN, TOTAL_BG, TOTAL_FG,
+    BORDER, ROW_FG, ROW_HEIGHT, HEADER_HEIGHT, TABLE_TOP, TABLE_LEFT,
+    CELL_PADDING, FONT_SIZE, TITLE_FONT_SIZE, BORDER_WIDTH,
+)
 
 
 def build_rows(funds: list) -> tuple[list, float, float, float, float, float]:
@@ -51,33 +56,22 @@ def main():
     col_widths = [0.24, 0.10, 0.07, 0.11, 0.11, 0.11, 0.11, 0.11]
     col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right"]
 
-    row_height = 0.12
-    header_height = 0.14
-    table_top = 0.92
-
-    HEADER_BG   = "#0057a8"
-    HEADER_FG   = "white"
-    ROW_BG_ODD  = "#f5f8fd"
-    ROW_BG_EVEN = "white"
-    TOTAL_BG    = "#dce8f7"
-    BORDER      = "#b0c4de"
-
     x_positions = []
-    x = 0.03
+    x = TABLE_LEFT
     for w in col_widths:
         x_positions.append(x)
         x += w
 
-    def draw_cell(ax, x, y, w, h, text, bg, fg, align, fontsize=10, bold=False):
+    def draw_cell(ax, x, y, w, h, text, bg, fg, align, fontsize=FONT_SIZE, bold=False):
         rect = plt.Rectangle((x, y), w, h, transform=ax.transAxes,
                               color=bg, zorder=1, clip_on=False,
-                              linewidth=0.8, edgecolor=BORDER)
+                              linewidth=BORDER_WIDTH, edgecolor=BORDER)
         ax.add_patch(rect)
         if align == "left":
-            tx = x + 0.01
+            tx = x + CELL_PADDING
             ha = "left"
         elif align == "right":
-            tx = x + w - 0.01
+            tx = x + w - CELL_PADDING
             ha = "right"
         else:
             tx = x + w / 2
@@ -91,29 +85,17 @@ def main():
         is_total  = row_idx == n_rows - 1
 
         if is_header:
-            bg = HEADER_BG
-            fg = HEADER_FG
-            h  = header_height
-            bold = True
-            fontsize = 10
+            bg, fg, h, bold = HEADER_BG, HEADER_FG, HEADER_HEIGHT, True
         elif is_total:
-            bg = TOTAL_BG
-            fg = "#003d7a"
-            h  = row_height
-            bold = True
-            fontsize = 10
+            bg, fg, h, bold = TOTAL_BG, TOTAL_FG, ROW_HEIGHT, True
         else:
-            bg = ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN
-            fg = "#1a1a2e"
-            h  = row_height
-            bold = False
-            fontsize = 10
+            bg, fg, h, bold = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, ROW_HEIGHT, False
 
         # y position (top-down)
         if row_idx == 0:
-            y = table_top - header_height
+            y = TABLE_TOP - HEADER_HEIGHT
         else:
-            y = table_top - header_height - (row_idx) * row_height
+            y = TABLE_TOP - HEADER_HEIGHT - row_idx * ROW_HEIGHT
 
         for col_idx in range(n_cols):
             draw_cell(
@@ -122,11 +104,11 @@ def main():
                 col_widths[col_idx], h,
                 row_data[col_idx],
                 bg, fg, col_aligns[col_idx],
-                fontsize=fontsize, bold=bold,
+                fontsize=FONT_SIZE, bold=bold,
             )
 
-    fig.suptitle("Fund Portfolio", fontsize=14, fontweight="bold",
-                 color="#0057a8", y=0.98)
+    fig.suptitle("Fund Portfolio", fontsize=TITLE_FONT_SIZE, fontweight="bold",
+                 color=HEADER_BG, y=0.98)
 
     plt.tight_layout()
     plt.show()
