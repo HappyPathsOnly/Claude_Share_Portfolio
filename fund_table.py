@@ -5,6 +5,7 @@ Displays current fund values in a tabular format.
 
 import csv
 import os
+import pandas
 import yfinance as yf
 import matplotlib.pyplot as plt
 
@@ -28,46 +29,67 @@ def load_funds(csv_path: str) -> list:
     return funds
 
 
-def fetch_latest_price_gbp(ticker: str) -> float:
-    """Fetch the latest closing price in GBP (converted from Yahoo Finance GBX)."""
+def fetch_prices_gbp(ticker: str) -> tuple[float, float, float, float, float]:
+    """Fetch latest, 1W, 1M, 6M and 1Y closing prices in GBP."""
     fund = yf.Ticker(ticker)
-    df = fund.history(period="5d")
+    df = fund.history(period="13mo")
     if df.empty:
         raise ValueError(f"No data returned for ticker {ticker!r}")
-    price_gbp = df["Close"].iloc[-1]  # Yahoo returns GBP for .L funds
-    return price_gbp
+
+    def price_at(days=None, months=None):
+        if days:
+            target = df.index[-1] - pandas.DateOffset(days=days)
+        else:
+            target = df.index[-1] - pandas.DateOffset(months=months)
+        idx = df.index.get_indexer([target], method="nearest")[0]
+        return df["Close"].iloc[idx]
+
+    return df["Close"].iloc[-1], price_at(days=7), price_at(months=1), price_at(months=6), price_at(months=12)
 
 
-def build_rows(funds: list) -> tuple[list, float]:
-    """Fetch prices and return (rows, total_value). Each row: [name, ticker, units, value]."""
+def build_rows(funds: list) -> tuple[list, float, float, float, float, float]:
+    """Return (rows, total_now, total_1w, total_1m, total_6m, total_1y)."""
     rows = []
-    total = 0.0
+    totals = [0.0, 0.0, 0.0, 0.0, 0.0]
     for f in funds:
-        price_gbp = fetch_latest_price_gbp(f["ticker"])
-        value = price_gbp * f["units"]
-        total += value
-        rows.append([f["name"], f["ticker"], f"{f['units']:,}", f"£{value:,.2f}"])
-    return rows, total
+        prices = fetch_prices_gbp(f["ticker"])
+        values = [p * f["units"] for p in prices]
+        for i, v in enumerate(values):
+            totals[i] += v
+        rows.append([
+            f["name"],
+            f["ticker"],
+            f"{f['units']:,}",
+            f"£{values[4]:,.2f}",
+            f"£{values[3]:,.2f}",
+            f"£{values[2]:,.2f}",
+            f"£{values[1]:,.2f}",
+            f"£{values[0]:,.2f}",
+        ])
+    return rows, *totals
 
 
 def main():
     print("Fetching fund data...")
     funds = load_funds(CSV_PATH)
-    rows, total = build_rows(funds)
+    rows, total_now, total_1w, total_1m, total_6m, total_1y = build_rows(funds)
 
-    col_headers = ["Fund Name", "Ticker", "Units", "Value"]
+    col_headers = ["Fund Name", "Ticker", "Units", "Value (1Y ago)", "Value (6M ago)", "Value (1M ago)", "Value (1W ago)", "Value"]
 
-    fig, ax = plt.subplots(figsize=(10, max(2.5, 0.5 + 0.4 * (len(rows) + 2))))
+    fig, ax = plt.subplots(figsize=(18, max(2.5, 0.5 + 0.4 * (len(rows) + 2))))
     ax.axis("off")
 
     # Build table data: header + data rows + total row
-    table_data = [col_headers] + rows + [["", "", "Total", f"£{total:,.2f}"]]
+    table_data = [col_headers] + rows + [[
+        "", "", "Total",
+        f"£{total_1y:,.2f}", f"£{total_6m:,.2f}", f"£{total_1m:,.2f}", f"£{total_1w:,.2f}", f"£{total_now:,.2f}",
+    ]]
 
     n_cols = len(col_headers)
     n_rows = len(table_data)
 
-    col_widths = [0.42, 0.18, 0.14, 0.18]
-    col_aligns = ["left", "center", "right", "right"]
+    col_widths = [0.24, 0.10, 0.07, 0.11, 0.11, 0.11, 0.11, 0.11]
+    col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right"]
 
     row_height = 0.12
     header_height = 0.14
