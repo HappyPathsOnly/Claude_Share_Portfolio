@@ -20,12 +20,12 @@ def pct_change(current, past) -> str:
 
 
 def build_rows(funds: list) -> tuple[list, list]:
-    """Return (rows, totals). totals = [total_now, total_1w, total_1m, total_6m, total_1y]."""
+    """Return (rows, totals). totals = [total_now, total_prev, total_1w, total_1m, total_6m, total_1y]."""
     rows = []
-    totals = [0.0, 0.0, 0.0, 0.0, 0.0]
+    totals = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     for f in funds:
         prices = fetch_prices_gbp(f["ticker"])
-        price_now, price_1w, price_1m, price_6m, price_1y = prices
+        price_now, price_prev, price_1w, price_1m, price_6m, price_1y = prices
         values = [p * f["units"] for p in prices]
         for i, v in enumerate(values):
             totals[i] += v
@@ -37,6 +37,7 @@ def build_rows(funds: list) -> tuple[list, list]:
             pct_change(price_now, price_6m),
             pct_change(price_now, price_1m),
             pct_change(price_now, price_1w),
+            pct_change(price_now, price_prev),
             f"£{values[0]:,.2f}",
         ])
     return rows, totals
@@ -46,7 +47,7 @@ def main():
     print("Fetching fund data...")
     funds = load_funds(CSV_PATH)
     rows, totals = build_rows(funds)
-    total_now, total_1w, total_1m, total_6m, total_1y = totals
+    total_now, total_prev, total_1w, total_1m, total_6m, total_1y = totals
 
     total_row = [
         "", "", "Total",
@@ -54,12 +55,13 @@ def main():
         pct_change(total_now, total_6m),
         pct_change(total_now, total_1m),
         pct_change(total_now, total_1w),
+        pct_change(total_now, total_prev),
         f"£{total_now:,.2f}",
     ]
 
-    col_headers = ["Fund Name", "Ticker", "Units", "1Y Change", "6M Change", "1M Change", "1W Change", "Value"]
+    col_headers = ["Fund Name", "Ticker", "Units", "1Y Change", "6M Change", "1M Change", "1W Change", "Prev Day", "Value"]
 
-    fig, ax = plt.subplots(figsize=(18, max(2.5, 0.5 + 0.4 * (len(rows) + 2))))
+    fig, ax = plt.subplots(figsize=(20, max(2.5, 0.5 + 0.4 * (len(rows) + 2))))
     ax.axis("off")
 
     table_data = [col_headers] + rows + [total_row]
@@ -67,8 +69,8 @@ def main():
     n_cols = len(col_headers)
     n_rows = len(table_data)
 
-    col_widths = [0.24, 0.10, 0.07, 0.11, 0.11, 0.11, 0.11, 0.11]
-    col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right"]
+    col_widths = [0.22, 0.09, 0.06, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09]
+    col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right", "right"]
 
     x_positions = []
     x = TABLE_LEFT
@@ -110,7 +112,7 @@ def main():
         for col_idx in range(n_cols):
             text = row_data[col_idx]
             # Colour percentage change columns green/red
-            if not is_header and col_idx in (3, 4, 5, 6):
+            if not is_header and col_idx in (3, 4, 5, 6, 7):
                 fg = GREEN if text.startswith("+") else RED
             else:
                 fg = base_fg

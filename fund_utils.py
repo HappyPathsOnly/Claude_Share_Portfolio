@@ -27,8 +27,8 @@ def load_funds(csv_path: str) -> list:
     return funds
 
 
-def fetch_prices_gbp(ticker: str) -> tuple[float, float, float, float, float]:
-    """Fetch latest, 1W, 1M, 6M and 1Y closing prices in GBP."""
+def fetch_prices_gbp(ticker: str) -> tuple[float, float, float, float, float, float]:
+    """Fetch latest, previous day, 1W, 1M, 6M and 1Y closing prices in GBP."""
     fund = yf.Ticker(ticker)
     df = fund.history(period="13mo")
     if df.empty:
@@ -42,4 +42,11 @@ def fetch_prices_gbp(ticker: str) -> tuple[float, float, float, float, float]:
         idx = df.index.get_indexer([target], method="nearest")[0]
         return df["Close"].iloc[idx]
 
-    return df["Close"].iloc[-1], price_at(days=7), price_at(months=1), price_at(months=6), price_at(months=12)
+    return (
+        df["Close"].iloc[-1],   # latest
+        df["Close"].iloc[-2],   # previous trading day
+        price_at(days=7),
+        price_at(months=1),
+        price_at(months=6),
+        price_at(months=12),
+    )

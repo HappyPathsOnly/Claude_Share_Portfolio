@@ -12,10 +12,10 @@ from fund_constants import (
 )
 
 
-def build_rows(funds: list) -> tuple[list, float, float, float, float, float]:
-    """Return (rows, total_now, total_1w, total_1m, total_6m, total_1y)."""
+def build_rows(funds: list) -> tuple[list, float, float, float, float, float, float]:
+    """Return (rows, total_now, total_prev, total_1w, total_1m, total_6m, total_1y)."""
     rows = []
-    totals = [0.0, 0.0, 0.0, 0.0, 0.0]
+    totals = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     for f in funds:
         prices = fetch_prices_gbp(f["ticker"])
         values = [p * f["units"] for p in prices]
@@ -25,6 +25,7 @@ def build_rows(funds: list) -> tuple[list, float, float, float, float, float]:
             f["name"],
             f["ticker"],
             f"{f['units']:,}",
+            f"£{values[5]:,.2f}",
             f"£{values[4]:,.2f}",
             f"£{values[3]:,.2f}",
             f"£{values[2]:,.2f}",
@@ -37,24 +38,25 @@ def build_rows(funds: list) -> tuple[list, float, float, float, float, float]:
 def main():
     print("Fetching fund data...")
     funds = load_funds(CSV_PATH)
-    rows, total_now, total_1w, total_1m, total_6m, total_1y = build_rows(funds)
+    rows, total_now, total_prev, total_1w, total_1m, total_6m, total_1y = build_rows(funds)
 
-    col_headers = ["Fund Name", "Ticker", "Units", "Value (1Y ago)", "Value (6M ago)", "Value (1M ago)", "Value (1W ago)", "Value"]
+    col_headers = ["Fund Name", "Ticker", "Units", "Value (1Y ago)", "Value (6M ago)", "Value (1M ago)", "Value (1W ago)", "Prev Day", "Value"]
 
-    fig, ax = plt.subplots(figsize=(18, max(2.5, 0.5 + 0.4 * (len(rows) + 2))))
+    fig, ax = plt.subplots(figsize=(20, max(2.5, 0.5 + 0.4 * (len(rows) + 2))))
     ax.axis("off")
 
     # Build table data: header + data rows + total row
     table_data = [col_headers] + rows + [[
         "", "", "Total",
-        f"£{total_1y:,.2f}", f"£{total_6m:,.2f}", f"£{total_1m:,.2f}", f"£{total_1w:,.2f}", f"£{total_now:,.2f}",
+        f"£{total_1y:,.2f}", f"£{total_6m:,.2f}", f"£{total_1m:,.2f}", f"£{total_1w:,.2f}",
+        f"£{total_prev:,.2f}", f"£{total_now:,.2f}",
     ]]
 
     n_cols = len(col_headers)
     n_rows = len(table_data)
 
-    col_widths = [0.24, 0.10, 0.07, 0.11, 0.11, 0.11, 0.11, 0.11]
-    col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right"]
+    col_widths = [0.22, 0.09, 0.06, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09]
+    col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right", "right"]
 
     x_positions = []
     x = TABLE_LEFT
