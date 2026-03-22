@@ -1,2 +1,4 @@
 funds.csv
+*.pyc
+__pycache__/
 
