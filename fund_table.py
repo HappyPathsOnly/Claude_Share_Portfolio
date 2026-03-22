@@ -8,7 +8,10 @@ import os
 import yfinance as yf
 import matplotlib.pyplot as plt
 
-CSV_PATH = os.path.join(os.path.dirname(__file__), "funds.csv")
+_dir = os.path.dirname(__file__)
+CSV_PATH = os.path.join(_dir, "funds.csv")
+if not os.path.exists(CSV_PATH):
+    CSV_PATH = os.path.join(_dir, "funds.example.csv")
 
 
 def load_funds(csv_path: str) -> list:
