@@ -7,7 +7,7 @@ A Python tool for displaying share/fund information fetched live from Yahoo Fina
 This project retrieves up-to-date pricing data for investment funds and displays it in three ways:
 
 - **fund_chart.py** — interactive price chart with selectable time periods (1M to 10Y)
-- **fund_table.py** — portfolio table showing fund value at previous day, 1 week, 1 month, 6 months, 1 year, and current value, with a total row
+- **fund_table.py** — portfolio table showing fund value at previous day, 1 week, 1 month, 6 months, 1 year, and current value, with a total row and a category summary table below
 - **fund_change_table.py** — portfolio table showing percentage change over the same time periods, with gains in green and losses in red
 
 Funds are configured via a simple `funds.csv` file — no code changes needed to add or remove funds.
@@ -72,5 +72,8 @@ Copy `funds.example.csv` to `funds.csv` and add one row per fund. The file requi
 | `name` | Display name of the fund |
 | `ticker` | Yahoo Finance ticker symbol (UK funds typically use the format `0P0000XXXX.L`) |
 | `units` | Number of units held |
+| `category` | Category label used to group funds (e.g. `A`, `B`) |
+
+The `category` column is used by `fund_table.py` to display a second summary table below the main one. Each row in that table shows the combined value of all funds assigned to that category across the same time periods, with a grand total row at the bottom.
 
 `funds.csv` is excluded from version control so your personal fund data remains local.
