@@ -14,15 +14,18 @@ if not os.path.exists(CSV_PATH):
 
 
 def load_funds(csv_path: str) -> list:
-    """Load fund definitions from a CSV file (columns: name, ticker, units)."""
+    """Load fund definitions from a CSV file (columns: name, ticker, units, category)."""
     funds = []
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            if not row.get("name", "").strip():
+                continue
             funds.append({
                 "name": row["name"].strip(),
                 "ticker": row["ticker"].strip(),
                 "units": int(row["units"].strip()),
+                "category": row.get("category", "").strip(),
             })
     return funds
 
@@ -33,6 +36,7 @@ def fetch_prices_gbp(ticker: str) -> tuple[float, float, float, float, float, fl
     df = fund.history(period="13mo")
     if df.empty:
         raise ValueError(f"No data returned for ticker {ticker!r}")
+    divisor = 100.0 if fund.fast_info.get("currency") == "GBp" else 1.0
 
     def price_at(days=None, months=None):
         if days:
@@ -43,10 +47,10 @@ def fetch_prices_gbp(ticker: str) -> tuple[float, float, float, float, float, fl
         return df["Close"].iloc[idx]
 
     return (
-        df["Close"].iloc[-1],   # latest
-        df["Close"].iloc[-2],   # previous trading day
-        price_at(days=7),
-        price_at(months=1),
-        price_at(months=6),
-        price_at(months=12),
+        df["Close"].iloc[-1] / divisor,   # latest
+        df["Close"].iloc[-2] / divisor,   # previous trading day
+        price_at(days=7) / divisor,
+        price_at(months=1) / divisor,
+        price_at(months=6) / divisor,
+        price_at(months=12) / divisor,
     )
