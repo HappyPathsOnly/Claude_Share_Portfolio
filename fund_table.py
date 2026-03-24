@@ -48,6 +48,7 @@ def main():
     n_categories = len(category_totals)
     figheight = max(4.0, 0.5 + 0.4 * (len(rows) + 2) + 0.4 * (n_categories + 3))
     fig, ax = plt.subplots(figsize=(20, figheight))
+    ax.set_position([0, 0, 1, 1])
     ax.axis("off")
 
     # Build table data: header + data rows + total row
@@ -59,6 +60,12 @@ def main():
 
     n_cols = len(col_headers)
     n_rows = len(table_data)
+
+    # Compute row heights dynamically so everything fits within the figure
+    n_cat_rows_total = n_categories + 2  # header + one per category + total
+    row_h = (TABLE_TOP - 0.02) / (n_rows + n_cat_rows_total + 2.4)
+    header_h = row_h * 1.2
+    gap = row_h * 2.0
 
     col_widths = [0.22, 0.09, 0.06, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09]
     col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right", "right"]
@@ -92,17 +99,17 @@ def main():
         is_total  = row_idx == n_rows - 1
 
         if is_header:
-            bg, fg, h, bold = HEADER_BG, HEADER_FG, HEADER_HEIGHT, True
+            bg, fg, h, bold = HEADER_BG, HEADER_FG, header_h, True
         elif is_total:
-            bg, fg, h, bold = TOTAL_BG, TOTAL_FG, ROW_HEIGHT, True
+            bg, fg, h, bold = TOTAL_BG, TOTAL_FG, row_h, True
         else:
-            bg, fg, h, bold = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, ROW_HEIGHT, False
+            bg, fg, h, bold = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, row_h, False
 
         # y position (top-down)
         if row_idx == 0:
-            y = TABLE_TOP - HEADER_HEIGHT
+            y = TABLE_TOP - header_h
         else:
-            y = TABLE_TOP - HEADER_HEIGHT - row_idx * ROW_HEIGHT
+            y = TABLE_TOP - header_h - row_idx * row_h
 
         for col_idx in range(n_cols):
             draw_cell(
@@ -144,9 +151,8 @@ def main():
     ]]
 
     # Position category table below the main table
-    GAP = 0.10
-    main_table_bottom = TABLE_TOP - HEADER_HEIGHT - (n_rows - 1) * ROW_HEIGHT
-    cat_table_top = main_table_bottom - GAP
+    main_table_bottom = TABLE_TOP - header_h - (n_rows - 1) * row_h
+    cat_table_top = main_table_bottom - gap
     n_cat_rows = len(cat_table_data)
     n_cat_cols = len(cat_col_headers)
 
@@ -155,16 +161,16 @@ def main():
         is_total  = row_idx == n_cat_rows - 1
 
         if is_header:
-            bg, fg, h, bold = HEADER_BG, HEADER_FG, HEADER_HEIGHT, True
+            bg, fg, h, bold = HEADER_BG, HEADER_FG, header_h, True
         elif is_total:
-            bg, fg, h, bold = TOTAL_BG, TOTAL_FG, ROW_HEIGHT, True
+            bg, fg, h, bold = TOTAL_BG, TOTAL_FG, row_h, True
         else:
-            bg, fg, h, bold = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, ROW_HEIGHT, False
+            bg, fg, h, bold = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, row_h, False
 
         if row_idx == 0:
-            y = cat_table_top - HEADER_HEIGHT
+            y = cat_table_top - header_h
         else:
-            y = cat_table_top - HEADER_HEIGHT - row_idx * ROW_HEIGHT
+            y = cat_table_top - header_h - row_idx * row_h
 
         for col_idx in range(n_cat_cols):
             draw_cell(
@@ -177,7 +183,7 @@ def main():
             )
 
     # Category table label
-    label_y = cat_table_top + 0.03
+    label_y = cat_table_top + row_h * 0.5
     ax.text(TABLE_LEFT, label_y, "By Category", transform=ax.transAxes,
             ha="left", va="bottom", fontsize=FONT_SIZE + 1,
             color=HEADER_BG, fontweight="bold", zorder=2, clip_on=False)
@@ -185,7 +191,6 @@ def main():
     fig.suptitle("Fund Portfolio", fontsize=TITLE_FONT_SIZE, fontweight="bold",
                  color=HEADER_BG, y=0.98)
 
-    plt.tight_layout()
     plt.show()
 
 
