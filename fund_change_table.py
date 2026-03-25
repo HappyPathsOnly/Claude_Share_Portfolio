@@ -19,9 +19,10 @@ def pct_change(current, past) -> str:
     return f"{sign}{change:.2f}%"
 
 
-def build_rows(funds: list) -> tuple[list, list]:
-    """Return (rows, totals). totals = [total_now, total_prev, total_1w, total_1m, total_6m, total_1y]."""
+def build_rows(funds: list) -> tuple[list, list, list]:
+    """Return (rows, totals, categories). totals = [total_now, total_prev, total_1w, total_1m, total_6m, total_1y]."""
     rows = []
+    categories = []
     totals = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     for f in funds:
         prices = fetch_prices_gbp(f["ticker"])
@@ -40,13 +41,14 @@ def build_rows(funds: list) -> tuple[list, list]:
             pct_change(price_now, price_prev),
             f"£{values[0]:,.2f}",
         ])
-    return rows, totals
+        categories.append(f["category"])
+    return rows, totals, categories
 
 
 def main():
     print("Fetching fund data...")
     funds = load_funds(CSV_PATH)
-    rows, totals = build_rows(funds)
+    rows, totals, categories = build_rows(funds)
     total_now, total_prev, total_1w, total_1m, total_6m, total_1y = totals
 
     total_row = [
@@ -61,13 +63,19 @@ def main():
 
     col_headers = ["Fund Name", "Ticker", "Units", "1Y Change", "6M Change", "1M Change", "1W Change", "Prev Day", "Value"]
 
-    fig, ax = plt.subplots(figsize=(20, max(2.5, 0.5 + 0.4 * (len(rows) + 2))))
-    ax.axis("off")
-
+    n_unique_cats = len(set(categories))
+    n_gaps = max(0, n_unique_cats - 1)
     table_data = [col_headers] + rows + [total_row]
-
     n_cols = len(col_headers)
     n_rows = len(table_data)
+
+    # Dynamic row height so all rows fit within the figure
+    row_h = (TABLE_TOP - 0.02) / (n_rows + 0.2 + n_gaps * 0.5)
+    header_h = row_h * 1.2
+    figheight = max(2.5, 0.5 + 0.4 * (n_rows + n_gaps * 0.5))
+    fig, ax = plt.subplots(figsize=(20, figheight))
+    ax.set_position([0, 0, 1, 1])
+    ax.axis("off")
 
     col_widths = [0.22, 0.09, 0.06, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09]
     col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right", "right"]
@@ -93,21 +101,26 @@ def main():
                 ha=ha, va="center", fontsize=fontsize,
                 color=fg, fontweight="bold" if bold else "normal", zorder=2, clip_on=False)
 
+    sep_h = row_h * 0.5
+    current_y = TABLE_TOP
+    prev_cat = None
+
     for row_idx, row_data in enumerate(table_data):
         is_header = row_idx == 0
         is_total  = row_idx == n_rows - 1
         if is_header:
-            bg, base_fg = HEADER_BG, HEADER_FG
+            bg, base_fg, h = HEADER_BG, HEADER_FG, header_h
         elif is_total:
-            bg, base_fg = TOTAL_BG, TOTAL_FG
+            bg, base_fg, h = TOTAL_BG, TOTAL_FG, row_h
         else:
-            bg, base_fg = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG
-        h = HEADER_HEIGHT if is_header else ROW_HEIGHT
+            cat = categories[row_idx - 1]
+            if prev_cat is not None and cat != prev_cat:
+                current_y -= sep_h
+            prev_cat = cat
+            bg, base_fg, h = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, row_h
 
-        if row_idx == 0:
-            y = TABLE_TOP - HEADER_HEIGHT
-        else:
-            y = TABLE_TOP - HEADER_HEIGHT - row_idx * ROW_HEIGHT
+        current_y -= h
+        y = current_y
 
         for col_idx in range(n_cols):
             text = row_data[col_idx]
@@ -118,12 +131,11 @@ def main():
                 fg = base_fg
             draw_cell(ax, x_positions[col_idx], y, col_widths[col_idx], h,
                       text, bg, fg, col_aligns[col_idx],
-                      fontsize=10, bold=(is_header or is_total))
+                      fontsize=FONT_SIZE, bold=(is_header or is_total))
 
     fig.suptitle("Fund Portfolio - Percentage Change", fontsize=TITLE_FONT_SIZE, fontweight="bold",
                  color=HEADER_BG, y=0.98)
 
-    plt.tight_layout()
     plt.show()
 
 

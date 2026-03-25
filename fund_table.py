@@ -14,8 +14,9 @@ from fund_constants import (
 
 
 def build_rows(funds: list) -> tuple:
-    """Return (rows, total_now, total_prev, total_1w, total_1m, total_6m, total_1y, category_totals)."""
+    """Return (rows, total_now, total_prev, total_1w, total_1m, total_6m, total_1y, category_totals, categories)."""
     rows = []
+    categories = []
     totals = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     category_totals = defaultdict(lambda: [0.0] * 6)
     for f in funds:
@@ -35,18 +36,20 @@ def build_rows(funds: list) -> tuple:
             f"£{values[1]:,.2f}",
             f"£{values[0]:,.2f}",
         ])
-    return rows, *totals, dict(category_totals)
+        categories.append(f["category"])
+    return rows, *totals, dict(category_totals), categories
 
 
 def main():
     print("Fetching fund data...")
     funds = load_funds(CSV_PATH)
-    rows, total_now, total_prev, total_1w, total_1m, total_6m, total_1y, category_totals = build_rows(funds)
+    rows, total_now, total_prev, total_1w, total_1m, total_6m, total_1y, category_totals, categories = build_rows(funds)
 
     col_headers = ["Fund Name", "Ticker", "Units", "Value (1Y ago)", "Value (6M ago)", "Value (1M ago)", "Value (1W ago)", "Prev Day", "Value"]
 
     n_categories = len(category_totals)
-    figheight = max(4.0, 0.5 + 0.4 * (len(rows) + 2) + 0.4 * (n_categories + 3))
+    n_gaps = max(0, n_categories - 1)
+    figheight = max(4.0, 0.5 + 0.4 * (len(rows) + 2) + 0.2 * n_gaps + 0.4 * (n_categories + 3))
     fig, ax = plt.subplots(figsize=(20, figheight))
     ax.set_position([0, 0, 1, 1])
     ax.axis("off")
@@ -94,6 +97,10 @@ def main():
                 ha=ha, va="center", fontsize=fontsize,
                 color=fg, fontweight="bold" if bold else "normal", zorder=2, clip_on=False)
 
+    sep_h = row_h * 0.5
+    current_y = TABLE_TOP
+    prev_cat = None
+
     for row_idx, row_data in enumerate(table_data):
         is_header = row_idx == 0
         is_total  = row_idx == n_rows - 1
@@ -103,13 +110,14 @@ def main():
         elif is_total:
             bg, fg, h, bold = TOTAL_BG, TOTAL_FG, row_h, True
         else:
+            cat = categories[row_idx - 1]
+            if prev_cat is not None and cat != prev_cat:
+                current_y -= sep_h
+            prev_cat = cat
             bg, fg, h, bold = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, row_h, False
 
-        # y position (top-down)
-        if row_idx == 0:
-            y = TABLE_TOP - header_h
-        else:
-            y = TABLE_TOP - header_h - row_idx * row_h
+        current_y -= h
+        y = current_y
 
         for col_idx in range(n_cols):
             draw_cell(
@@ -120,6 +128,8 @@ def main():
                 bg, fg, col_aligns[col_idx],
                 fontsize=FONT_SIZE, bold=bold,
             )
+
+    main_table_bottom_y = current_y
 
     # --- Category summary table ---
     cat_col_headers = ["Category", "Value (1Y ago)", "Value (6M ago)", "Value (1M ago)", "Value (1W ago)", "Prev Day", "Value"]
@@ -151,8 +161,7 @@ def main():
     ]]
 
     # Position category table below the main table
-    main_table_bottom = TABLE_TOP - header_h - (n_rows - 1) * row_h
-    cat_table_top = main_table_bottom - gap
+    cat_table_top = main_table_bottom_y - gap
     n_cat_rows = len(cat_table_data)
     n_cat_cols = len(cat_col_headers)
 
