@@ -24,7 +24,7 @@ def load_funds(csv_path: str) -> list:
             funds.append({
                 "name": row["name"].strip(),
                 "ticker": row["ticker"].strip(),
-                "units": int(row["units"].strip()),
+                "units": float(row["units"].strip()),
                 "category": row.get("category", "").strip(),
             })
     return funds
