@@ -1,6 +1,8 @@
 # Fund Tracker
 
-A Python tool for displaying share/fund information fetched live from Yahoo Finance.
+Fund Tracker is a Python portfolio management tool that visualises your share and fund investments using live data from Yahoo Finance. Configure your holdings once in a CSV file and get instant views of your portfolio's current value, historical snapshots (1 week to 10 years back), and percentage gains/losses. Supports GBp/GBX pence-denominated instruments with automatic currency conversion.
+
+Initial code is generated with Claude Code. 
 
 ## Overview
 
@@ -14,15 +16,72 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 
 ## Project Structure
 
+The project is organised into four layers following a **model/renderer split** — see [Design Pattern](#design-pattern) below.
+
+### Entry Points
+
 | File | Description |
 |------|-------------|
-| `fund_chart.py` | Interactive price chart |
-| `fund_table.py` | Absolute value table |
-| `fund_change_table.py` | Percentage change table |
-| `fund_utils.py` | Shared data loading and price fetching functions |
-| `fund_constants.py` | Shared styling and layout constants |
+| `fund_chart.py` | Builds the chart model and launches the interactive price chart |
+| `fund_table.py` | Builds the value table model and launches the absolute value table |
+| `fund_change_table.py` | Builds the change table model and launches the percentage change table |
+
+### Model / Business Logic
+
+| File | Description |
+|------|-------------|
+| `fund_utils.py` | Shared data loading (`load_funds`) and price fetching (`fetch_prices_gbp`) |
+| `fund_constants.py` | Shared styling and layout constants (colours, font sizes, row heights) |
+
+### Renderer Abstractions
+
+| File | Description |
+|------|-------------|
+| `fund_chart_renderer.py` | Abstract `ChartRenderer` base class and `ChartModel` dataclass |
+| `fund_table_renderer.py` | Abstract `TableRenderer` base class and `TableModel` dataclass |
+| `fund_value_table_renderer.py` | Abstract `ValueTableRenderer` base class and `ValueTableModel` dataclass |
+
+### Renderer Implementations (Matplotlib)
+
+| File | Description |
+|------|-------------|
+| `fund_chart_matplotlib.py` | `MatplotlibChartRenderer` — draws the interactive line chart |
+| `fund_table_matplotlib.py` | `MatplotlibTableRenderer` — draws the percentage change table |
+| `fund_value_table_matplotlib.py` | `MatplotlibValueTableRenderer` — draws the absolute value and category summary tables |
+| `fund_matplotlib_utils.py` | Shared matplotlib helpers: cell drawing, column position calculation |
+
+### Configuration
+
+| File | Description |
+|------|-------------|
 | `funds.csv` | Your local fund configuration (not committed to git) |
 | `funds.example.csv` | Example fund configuration for reference |
+
+## Design Pattern
+
+The project separates **what data to show** from **how to show it** using three layers:
+
+```
+Entry point  →  builds a Model  →  passes it to a Renderer
+```
+
+### 1. Models (pure data)
+
+Each display mode has a corresponding dataclass — `ChartModel`, `TableModel`, `ValueTableModel` — that holds only the data needed for rendering: rows, headers, callbacks, etc. Models contain no GUI code and can be constructed and tested without touching matplotlib.
+
+### 2. Renderer abstractions (interfaces)
+
+Each model has a paired abstract base class — `ChartRenderer`, `TableRenderer`, `ValueTableRenderer` — that declares a single `render(model)` method. These are the contracts that any rendering backend must fulfil.
+
+### 3. Renderer implementations (GUI)
+
+The `*_matplotlib.py` files contain all matplotlib calls. They implement the abstract renderer interfaces and are the only place that knows about the GUI framework.
+
+### Why this structure?
+
+- **Testability** — model-building logic can be tested independently of any GUI
+- **Replaceability** — swapping matplotlib for another backend (Qt, web, terminal) only requires a new `*_renderer.py` implementation; the models and entry points are untouched
+- **Single responsibility** — data fetching, model building, and rendering each live in their own layer
 
 ## Built With
 
