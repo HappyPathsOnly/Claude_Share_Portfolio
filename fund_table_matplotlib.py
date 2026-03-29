@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 from fund_table_renderer import TableModel, TableRenderer
 from fund_constants import (
     HEADER_BG, HEADER_FG, ROW_BG_ODD, ROW_BG_EVEN, TOTAL_BG, TOTAL_FG,
-    BORDER, ROW_FG, GREEN, RED, TABLE_TOP, TABLE_LEFT,
-    CELL_PADDING, FONT_SIZE, TITLE_FONT_SIZE, BORDER_WIDTH,
+    ROW_FG, GREEN, RED, TABLE_TOP, FONT_SIZE, TITLE_FONT_SIZE,
 )
+from fund_matplotlib_utils import draw_cell, compute_x_positions
 
 
 class MatplotlibTableRenderer(TableRenderer):
@@ -33,27 +33,7 @@ class MatplotlibTableRenderer(TableRenderer):
 
         col_widths = [0.22, 0.09, 0.06, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09]
         col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right", "right"]
-
-        x_positions = []
-        x = TABLE_LEFT
-        for w in col_widths:
-            x_positions.append(x)
-            x += w
-
-        def draw_cell(ax, x, y, w, h, text, bg, fg, align, fontsize=FONT_SIZE, bold=False):
-            rect = plt.Rectangle((x, y), w, h, transform=ax.transAxes,
-                                  color=bg, zorder=1, clip_on=False,
-                                  linewidth=BORDER_WIDTH, edgecolor=BORDER)
-            ax.add_patch(rect)
-            if align == "left":
-                tx, ha = x + CELL_PADDING, "left"
-            elif align == "right":
-                tx, ha = x + w - CELL_PADDING, "right"
-            else:
-                tx, ha = x + w / 2, "center"
-            ax.text(tx, y + h / 2, text, transform=ax.transAxes,
-                    ha=ha, va="center", fontsize=fontsize,
-                    color=fg, fontweight="bold" if bold else "normal", zorder=2, clip_on=False)
+        x_positions = compute_x_positions(col_widths)
 
         sep_h = row_h * 0.5
         current_y = TABLE_TOP
