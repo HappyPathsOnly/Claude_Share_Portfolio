@@ -3,14 +3,9 @@ Fund Portfolio - Value Table
 Displays current fund values in a tabular format.
 """
 
-import matplotlib.pyplot as plt
 from collections import defaultdict
 from fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
-from fund_constants import (
-    HEADER_BG, HEADER_FG, ROW_BG_ODD, ROW_BG_EVEN, TOTAL_BG, TOTAL_FG,
-    BORDER, ROW_FG, ROW_HEIGHT, HEADER_HEIGHT, TABLE_TOP, TABLE_LEFT,
-    CELL_PADDING, FONT_SIZE, TITLE_FONT_SIZE, BORDER_WIDTH,
-)
+from fund_value_table_renderer import ValueTableModel, ValueTableRenderer
 
 
 def build_rows(funds: list) -> tuple:
@@ -40,107 +35,19 @@ def build_rows(funds: list) -> tuple:
     return rows, *totals, dict(category_totals), categories
 
 
-def main():
-    print("Fetching fund data...")
-    funds = load_funds(CSV_PATH)
+def build_table_model(funds: list) -> ValueTableModel:
+    """Build a ValueTableModel from a list of fund dicts."""
     rows, total_now, total_prev, total_1w, total_1m, total_6m, total_1y, category_totals, categories = build_rows(funds)
 
     col_headers = ["Fund Name", "Ticker", "Units", "Value (1Y ago)", "Value (6M ago)", "Value (1M ago)", "Value (1W ago)", "Prev Day", "Value"]
 
-    n_categories = len(category_totals)
-    n_gaps = max(0, n_categories - 1)
-    figheight = max(4.0, 0.5 + 0.4 * (len(rows) + 2) + 0.2 * n_gaps + 0.4 * (n_categories + 3))
-    fig, ax = plt.subplots(figsize=(20, figheight))
-    ax.set_position([0, 0, 1, 1])
-    ax.axis("off")
-
-    # Build table data: header + data rows + total row
-    table_data = [col_headers] + rows + [[
+    total_row = [
         "", "", "Total",
         f"£{total_1y:,.2f}", f"£{total_6m:,.2f}", f"£{total_1m:,.2f}", f"£{total_1w:,.2f}",
         f"£{total_prev:,.2f}", f"£{total_now:,.2f}",
-    ]]
+    ]
 
-    n_cols = len(col_headers)
-    n_rows = len(table_data)
-
-    # Compute row heights dynamically so everything fits within the figure
-    n_cat_rows_total = n_categories + 2  # header + one per category + total
-    row_h = (TABLE_TOP - 0.02) / (n_rows + n_cat_rows_total + 2.4)
-    header_h = row_h * 1.2
-    gap = row_h * 2.0
-
-    col_widths = [0.22, 0.09, 0.06, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09]
-    col_aligns = ["left", "center", "right", "right", "right", "right", "right", "right", "right"]
-
-    x_positions = []
-    x = TABLE_LEFT
-    for w in col_widths:
-        x_positions.append(x)
-        x += w
-
-    def draw_cell(ax, x, y, w, h, text, bg, fg, align, fontsize=FONT_SIZE, bold=False):
-        rect = plt.Rectangle((x, y), w, h, transform=ax.transAxes,
-                              color=bg, zorder=1, clip_on=False,
-                              linewidth=BORDER_WIDTH, edgecolor=BORDER)
-        ax.add_patch(rect)
-        if align == "left":
-            tx = x + CELL_PADDING
-            ha = "left"
-        elif align == "right":
-            tx = x + w - CELL_PADDING
-            ha = "right"
-        else:
-            tx = x + w / 2
-            ha = "center"
-        ax.text(tx, y + h / 2, text, transform=ax.transAxes,
-                ha=ha, va="center", fontsize=fontsize,
-                color=fg, fontweight="bold" if bold else "normal", zorder=2, clip_on=False)
-
-    sep_h = row_h * 0.5
-    current_y = TABLE_TOP
-    prev_cat = None
-
-    for row_idx, row_data in enumerate(table_data):
-        is_header = row_idx == 0
-        is_total  = row_idx == n_rows - 1
-
-        if is_header:
-            bg, fg, h, bold = HEADER_BG, HEADER_FG, header_h, True
-        elif is_total:
-            bg, fg, h, bold = TOTAL_BG, TOTAL_FG, row_h, True
-        else:
-            cat = categories[row_idx - 1]
-            if prev_cat is not None and cat != prev_cat:
-                current_y -= sep_h
-            prev_cat = cat
-            bg, fg, h, bold = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, row_h, False
-
-        current_y -= h
-        y = current_y
-
-        for col_idx in range(n_cols):
-            draw_cell(
-                ax,
-                x_positions[col_idx], y,
-                col_widths[col_idx], h,
-                row_data[col_idx],
-                bg, fg, col_aligns[col_idx],
-                fontsize=FONT_SIZE, bold=bold,
-            )
-
-    main_table_bottom_y = current_y
-
-    # --- Category summary table ---
     cat_col_headers = ["Category", "Value (1Y ago)", "Value (6M ago)", "Value (1M ago)", "Value (1W ago)", "Prev Day", "Value"]
-    cat_col_widths = [0.22, 0.115, 0.115, 0.115, 0.115, 0.115, 0.115]
-    cat_col_aligns = ["left", "right", "right", "right", "right", "right", "right"]
-
-    cat_x_positions = []
-    x = TABLE_LEFT
-    for w in cat_col_widths:
-        cat_x_positions.append(x)
-        x += w
 
     cat_total = [0.0] * 6
     cat_data_rows = []
@@ -154,54 +61,30 @@ def main():
             f"£{v[2]:,.2f}", f"£{v[1]:,.2f}", f"£{v[0]:,.2f}",
         ])
 
-    cat_table_data = [cat_col_headers] + cat_data_rows + [[
+    cat_total_row = [
         "Total",
         f"£{cat_total[5]:,.2f}", f"£{cat_total[4]:,.2f}", f"£{cat_total[3]:,.2f}",
         f"£{cat_total[2]:,.2f}", f"£{cat_total[1]:,.2f}", f"£{cat_total[0]:,.2f}",
-    ]]
+    ]
 
-    # Position category table below the main table
-    cat_table_top = main_table_bottom_y - gap
-    n_cat_rows = len(cat_table_data)
-    n_cat_cols = len(cat_col_headers)
+    return ValueTableModel(
+        col_headers=col_headers,
+        rows=rows,
+        total_row=total_row,
+        categories=categories,
+        cat_col_headers=cat_col_headers,
+        cat_data_rows=cat_data_rows,
+        cat_total_row=cat_total_row,
+    )
 
-    for row_idx, row_data in enumerate(cat_table_data):
-        is_header = row_idx == 0
-        is_total  = row_idx == n_cat_rows - 1
 
-        if is_header:
-            bg, fg, h, bold = HEADER_BG, HEADER_FG, header_h, True
-        elif is_total:
-            bg, fg, h, bold = TOTAL_BG, TOTAL_FG, row_h, True
-        else:
-            bg, fg, h, bold = (ROW_BG_ODD if row_idx % 2 == 1 else ROW_BG_EVEN), ROW_FG, row_h, False
-
-        if row_idx == 0:
-            y = cat_table_top - header_h
-        else:
-            y = cat_table_top - header_h - row_idx * row_h
-
-        for col_idx in range(n_cat_cols):
-            draw_cell(
-                ax,
-                cat_x_positions[col_idx], y,
-                cat_col_widths[col_idx], h,
-                row_data[col_idx],
-                bg, fg, cat_col_aligns[col_idx],
-                fontsize=FONT_SIZE, bold=bold,
-            )
-
-    # Category table label
-    label_y = cat_table_top + row_h * 0.5
-    ax.text(TABLE_LEFT, label_y, "By Category", transform=ax.transAxes,
-            ha="left", va="bottom", fontsize=FONT_SIZE + 1,
-            color=HEADER_BG, fontweight="bold", zorder=2, clip_on=False)
-
-    fig.suptitle("Fund Portfolio", fontsize=TITLE_FONT_SIZE, fontweight="bold",
-                 color=HEADER_BG, y=0.98)
-
-    plt.show()
+def main(renderer: ValueTableRenderer):
+    print("Fetching fund data...")
+    funds = load_funds(CSV_PATH)
+    model = build_table_model(funds)
+    renderer.render(model)
 
 
 if __name__ == "__main__":
-    main()
+    from fund_value_table_matplotlib import MatplotlibValueTableRenderer
+    main(MatplotlibValueTableRenderer())
