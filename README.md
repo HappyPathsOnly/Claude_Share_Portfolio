@@ -14,6 +14,17 @@ This project retrieves up-to-date pricing data for investment funds and displays
 
 Funds are configured via a simple `funds.csv` file — no code changes needed to add or remove funds.
 
+## Screenshots
+
+### Fund Chart (`fund_chart.py`)
+![Fund Chart](images/fund_chart02_04_2026.jpg)
+
+### Fund Value Table (`fund_table.py`)
+![Fund Table](images/fund_table02_04_2026.jpg)
+
+### Fund Change Table (`fund_change_table.py`)
+![Fund Change Table](images/fund_change_table_02_04_2026.jpg)
+
 ## Project Structure
 
 The project is organised into four layers following a **model/renderer split** — see [Design Pattern](#design-pattern) below.
