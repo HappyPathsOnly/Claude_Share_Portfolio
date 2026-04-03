@@ -2,3 +2,6 @@ funds.csv
 *.pyc
 __pycache__/
 
+# Bokeh output
+*.html
+

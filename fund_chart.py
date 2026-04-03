@@ -55,5 +55,14 @@ def main(renderer: ChartRenderer):
 
 
 if __name__ == "__main__":
-    from fund_chart_matplotlib import MatplotlibChartRenderer
-    main(MatplotlibChartRenderer())
+    import argparse
+    parser = argparse.ArgumentParser(description="Fund price chart")
+    parser.add_argument("--bokeh", action="store_true", help="Use Bokeh renderer (opens in browser)")
+    args = parser.parse_args()
+
+    if args.bokeh:
+        from GUI.Bokeh.fund_chart_bokeh import BokehChartRenderer
+        main(BokehChartRenderer())
+    else:
+        from fund_chart_matplotlib import MatplotlibChartRenderer
+        main(MatplotlibChartRenderer())

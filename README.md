@@ -61,6 +61,16 @@ The project is organised into four layers following a **model/renderer split** �
 | `fund_value_table_matplotlib.py` | `MatplotlibValueTableRenderer` — draws the absolute value and category summary tables |
 | `fund_matplotlib_utils.py` | Shared matplotlib helpers: cell drawing, column position calculation |
 
+### Renderer Implementations (Bokeh)
+
+Located in `GUI/Bokeh/`. Each file implements the same renderer interface as its matplotlib counterpart, so the entry points and model-building logic are untouched.
+
+| File | Description |
+|------|-------------|
+| `GUI/Bokeh/fund_chart_bokeh.py` | `BokehChartRenderer` — interactive price chart with period buttons; pre-fetches all periods and switches instantly in the browser |
+| `GUI/Bokeh/fund_change_table_bokeh.py` | `BokehChangeTableRenderer` — percentage change table with green/red colouring on gain/loss cells |
+| `GUI/Bokeh/fund_value_table_bokeh.py` | `BokehValueTableRenderer` — absolute value table plus category summary table |
+
 ### Configuration
 
 | File | Description |
@@ -86,7 +96,7 @@ Each model has a paired abstract base class — `ChartRenderer`, `TableRenderer`
 
 ### 3. Renderer implementations (GUI)
 
-The `*_matplotlib.py` files contain all matplotlib calls. They implement the abstract renderer interfaces and are the only place that knows about the GUI framework.
+The `*_matplotlib.py` files and the `GUI/Bokeh/*_bokeh.py` files contain all framework-specific code. They implement the abstract renderer interfaces and are the only place that knows about the GUI framework. Adding a new backend (e.g. a terminal renderer or a web framework) requires only a new implementation file — the models and entry points remain untouched.
 
 ### Why this structure?
 
@@ -99,6 +109,7 @@ The `*_matplotlib.py` files contain all matplotlib calls. They implement the abs
 - **Python**
 - **[yfinance](https://github.com/ranaroussi/yfinance)** — fetches live pricing data from Yahoo Finance
 - **[matplotlib](https://matplotlib.org/)** — renders charts and tables
+- **[bokeh](https://docs.bokeh.org/en/latest/)** — renders interactive browser-based charts and tables
 - **[Claude](https://claude.ai/)** — AI assistant used to develop this project
 
 ## Getting Started
@@ -115,22 +126,27 @@ pip install -r requirements.txt
 
 ### Running
 
-Display the absolute value table:
+Each entry point defaults to the matplotlib renderer. Pass `--bokeh` to open the browser-based Bokeh version instead.
+
+**Absolute value table:**
 
 ```bash
-python fund_table.py
+python fund_table.py           # matplotlib
+python fund_table.py --bokeh   # Bokeh (browser)
 ```
 
-Display the percentage change table:
+**Percentage change table:**
 
 ```bash
-python fund_change_table.py
+python fund_change_table.py           # matplotlib
+python fund_change_table.py --bokeh   # Bokeh (browser)
 ```
 
-Display the interactive price chart:
+**Interactive price chart:**
 
 ```bash
-python fund_chart.py
+python fund_chart.py           # matplotlib
+python fund_chart.py --bokeh   # Bokeh (browser, pre-fetches all periods)
 ```
 
 ## Adding Funds
