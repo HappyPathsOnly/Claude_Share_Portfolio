@@ -2,13 +2,20 @@
 Matplotlib renderer for the fund change table.
 """
 
+import sys
+import os
+
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
+
 import matplotlib.pyplot as plt
 from fund_table_renderer import TableModel, TableRenderer
 from fund_constants import (
     HEADER_BG, HEADER_FG, ROW_BG_ODD, ROW_BG_EVEN, TOTAL_BG, TOTAL_FG,
     ROW_FG, GREEN, RED, TABLE_TOP, FONT_SIZE, TITLE_FONT_SIZE,
 )
-from fund_matplotlib_utils import draw_cell, compute_x_positions
+from .fund_matplotlib_utils import draw_cell, compute_x_positions
 
 
 class MatplotlibTableRenderer(TableRenderer):

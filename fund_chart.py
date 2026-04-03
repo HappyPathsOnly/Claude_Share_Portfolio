@@ -64,5 +64,5 @@ if __name__ == "__main__":
         from GUI.Bokeh.fund_chart_bokeh import BokehChartRenderer
         main(BokehChartRenderer())
     else:
-        from fund_chart_matplotlib import MatplotlibChartRenderer
+        from GUI.Matplotlib.fund_chart_matplotlib import MatplotlibChartRenderer
         main(MatplotlibChartRenderer())

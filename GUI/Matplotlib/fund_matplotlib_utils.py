@@ -2,6 +2,13 @@
 Shared matplotlib helpers for fund table renderers.
 """
 
+import sys
+import os
+
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
+
 import matplotlib.pyplot as plt
 from fund_constants import CELL_PADDING, FONT_SIZE, BORDER_WIDTH, BORDER, TABLE_LEFT
 

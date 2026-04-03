@@ -82,5 +82,5 @@ if __name__ == "__main__":
         from GUI.Bokeh.fund_change_table_bokeh import BokehChangeTableRenderer
         main(BokehChangeTableRenderer())
     else:
-        from fund_table_matplotlib import MatplotlibTableRenderer
+        from GUI.Matplotlib.fund_table_matplotlib import MatplotlibTableRenderer
         main(MatplotlibTableRenderer())

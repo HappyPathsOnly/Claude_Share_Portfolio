@@ -54,12 +54,14 @@ The project is organised into four layers following a **model/renderer split** �
 
 ### Renderer Implementations (Matplotlib)
 
+Located in `GUI/Matplotlib/`. Each file implements the same renderer interface as its Bokeh counterpart.
+
 | File | Description |
 |------|-------------|
-| `fund_chart_matplotlib.py` | `MatplotlibChartRenderer` — draws the interactive line chart |
-| `fund_table_matplotlib.py` | `MatplotlibTableRenderer` — draws the percentage change table |
-| `fund_value_table_matplotlib.py` | `MatplotlibValueTableRenderer` — draws the absolute value and category summary tables |
-| `fund_matplotlib_utils.py` | Shared matplotlib helpers: cell drawing, column position calculation |
+| `GUI/Matplotlib/fund_chart_matplotlib.py` | `MatplotlibChartRenderer` — draws the interactive line chart |
+| `GUI/Matplotlib/fund_table_matplotlib.py` | `MatplotlibTableRenderer` — draws the percentage change table |
+| `GUI/Matplotlib/fund_value_table_matplotlib.py` | `MatplotlibValueTableRenderer` — draws the absolute value and category summary tables |
+| `GUI/Matplotlib/fund_matplotlib_utils.py` | Shared matplotlib helpers: cell drawing, column position calculation |
 
 ### Renderer Implementations (Bokeh)
 

@@ -95,5 +95,5 @@ if __name__ == "__main__":
         from GUI.Bokeh.fund_value_table_bokeh import BokehValueTableRenderer
         main(BokehValueTableRenderer())
     else:
-        from fund_value_table_matplotlib import MatplotlibValueTableRenderer
+        from GUI.Matplotlib.fund_value_table_matplotlib import MatplotlibValueTableRenderer
         main(MatplotlibValueTableRenderer())
