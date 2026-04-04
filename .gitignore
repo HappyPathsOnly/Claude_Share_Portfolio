@@ -5,3 +5,8 @@ __pycache__/
 # Bokeh output
 *.html
 
+# Playwright / Node
+tests/e2e/node_modules/
+tests/e2e/playwright-report/
+tests/e2e/test-results/
+

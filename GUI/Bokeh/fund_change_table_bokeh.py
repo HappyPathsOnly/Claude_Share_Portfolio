@@ -58,7 +58,7 @@ def _pct_color(text: str) -> str:
 
 
 class BokehChangeTableRenderer(TableRenderer):
-    def render(self, model: TableModel) -> None:
+    def render(self, model: TableModel, output_path: str | None = None) -> None:
         n_cols = len(model.col_headers)
         keys = [f"c{i}" for i in range(n_cols)]
         color_keys = {i: f"c{i}_color" for i in _PCT_COLS}
@@ -116,8 +116,14 @@ class BokehChangeTableRenderer(TableRenderer):
             stylesheets=[make_table_stylesheet()],
         )
 
-        show(column(
+        layout = column(
             page_css_div(),
             make_title_div("Fund Portfolio \u2013 Percentage Change", 1380),
             table,
-        ))
+        )
+        if output_path:
+            from bokeh.io import output_file, save
+            output_file(output_path)
+            save(layout)
+        else:
+            show(layout)

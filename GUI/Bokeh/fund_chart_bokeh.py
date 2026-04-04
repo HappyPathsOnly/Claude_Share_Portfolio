@@ -66,7 +66,7 @@ def _title_html(fund_name: str, label: str, ys: list[float]) -> str:
 
 
 class BokehChartRenderer(ChartRenderer):
-    def render(self, model: ChartModel) -> None:
+    def render(self, model: ChartModel, output_path: str | None = None) -> None:
         # --- Pre-fetch all periods ---
         print("  Pre-fetching all periods for Bokeh chart...")
         all_data: dict[str, dict] = {}
@@ -227,4 +227,10 @@ source.change.emit();
         )
         btn_group.js_on_change("active", callback)
 
-        show(column(page_css_div(), title_div, p, btn_group))
+        layout = column(page_css_div(), title_div, p, btn_group)
+        if output_path:
+            from bokeh.io import output_file, save
+            output_file(output_path)
+            save(layout)
+        else:
+            show(layout)

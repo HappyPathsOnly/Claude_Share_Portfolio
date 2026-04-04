@@ -69,7 +69,7 @@ def _build_source_and_columns(
 
 
 class BokehValueTableRenderer(ValueTableRenderer):
-    def render(self, model: ValueTableModel) -> None:
+    def render(self, model: ValueTableModel, output_path: str | None = None) -> None:
         # --- Main fund table ---
         main_source, main_cols, main_seps = _build_source_and_columns(
             model.col_headers, model.rows, model.total_row, categories=model.categories
@@ -102,10 +102,16 @@ class BokehValueTableRenderer(ValueTableRenderer):
             stylesheets=[make_table_stylesheet()],
         )
 
-        show(column(
+        layout = column(
             page_css_div(),
             make_title_div("Fund Portfolio", 1380),
             main_table,
             make_title_div("By Category", 870),
             cat_table,
-        ))
+        )
+        if output_path:
+            from bokeh.io import output_file, save
+            output_file(output_path)
+            save(layout)
+        else:
+            show(layout)

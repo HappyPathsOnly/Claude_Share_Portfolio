@@ -106,6 +106,49 @@ The `*_matplotlib.py` files and the `GUI/Bokeh/*_bokeh.py` files contain all fra
 - **Replaceability** — swapping matplotlib for another backend (Qt, web, terminal) only requires a new `*_renderer.py` implementation; the models and entry points are untouched
 - **Single responsibility** — data fetching, model building, and rendering each live in their own layer
 
+## Testing
+
+End-to-end tests are written in TypeScript using [Playwright](https://playwright.dev/) and live in `tests/e2e/`. Each test run regenerates the three Bokeh HTML files from live data before any assertions run, so the tests always reflect the current state of the code and your portfolio.
+
+### What is tested
+
+| Spec file | What it covers |
+|-----------|----------------|
+| `tests/fund_table.spec.ts` | Title bars ("Fund Portfolio", "By Category"), all 9 column headers, presence of data rows and total row in both the main and category tables |
+| `tests/fund_change_table.spec.ts` | Title bar, all 9 column headers, presence of data rows and total row |
+| `tests/fund_chart.spec.ts` | Fund name in title, all 7 period buttons (1M–10Y), chart canvas rendered |
+
+### Setup
+
+Node.js 18+ is required. Install dependencies and the Playwright browser once:
+
+```bash
+cd tests/e2e
+npm install
+npx playwright install chromium
+```
+
+### Running the tests
+
+```bash
+cd tests/e2e
+npm test
+```
+
+The global setup step runs `generate_html.py` automatically — this fetches live data and writes the HTML files before Playwright opens them. Expect the first run to take a couple of minutes due to the network calls.
+
+To run in headed mode (watch the browser):
+
+```bash
+npm run test:headed
+```
+
+To view the HTML report after a run:
+
+```bash
+npm run report
+```
+
 ## Built With
 
 - **Python**
