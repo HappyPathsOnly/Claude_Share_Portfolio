@@ -14,6 +14,9 @@ import os
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
+_HERE = os.path.abspath(os.path.dirname(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
 
 try:
     from bokeh.models import (
@@ -31,45 +34,7 @@ except ImportError as exc:
     ) from exc
 
 from fund_chart_renderer import ChartModel, ChartRenderer
-from fund_constants import HEADER_BG
-
-_BLUE       = HEADER_BG   # "#0057a8"
-_DARK_BLUE  = "#003d7a"
-_BTN_ACTIVE = _BLUE
-_BTN_IDLE   = "#e0e8f5"
-
-# Light-DOM page styling.
-_PAGE_CSS = """
-<style>
-  body {
-    background-color: #f0f4f8;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    padding: 16px;
-  }
-</style>
-"""
-
-# Shadow-DOM CSS for the RadioButtonGroup widget.
-_BTN_CSS = f"""
-  :host {{
-    font-family: 'Segoe UI', Arial, sans-serif;
-  }}
-  .bk-btn {{
-    background-color: {_BTN_IDLE} !important;
-    color: {_BLUE} !important;
-    border-color: {_BLUE} !important;
-    font-weight: 700 !important;
-    font-size: 12px !important;
-    letter-spacing: 0.04em !important;
-  }}
-  .bk-btn.bk-active {{
-    background: linear-gradient(180deg, {_BLUE} 0%, {_DARK_BLUE} 100%) !important;
-    color: white !important;
-  }}
-  .bk-btn:hover:not(.bk-active) {{
-    background-color: #c8d8ee !important;
-  }}
-"""
+from bokeh_theme import BLUE, DARK_BLUE, BTN_CSS, page_css_div
 
 
 def _to_ms(index) -> list[int]:
@@ -87,7 +52,7 @@ def _title_html(fund_name: str, label: str, ys: list[float]) -> str:
     sign = "+" if change >= 0 else ""
     return (
         f'<div style="width:1100px;">'
-        f'<div style="background:linear-gradient(180deg,{_BLUE} 0%,{_DARK_BLUE} 100%); '
+        f'<div style="background:linear-gradient(180deg,{BLUE} 0%,{DARK_BLUE} 100%); '
         f'padding:10px 16px; border-radius:4px 4px 0 0; display:flex; '
         f'justify-content:space-between; align-items:center;">'
         f'<span style="color:white; font-family:\'Segoe UI\',Arial,sans-serif; '
@@ -162,15 +127,15 @@ class BokehChartRenderer(ChartRenderer):
         p.axis.axis_line_color            = "#b0c4de"
 
         # Line and fill
-        p.line("x", "y", source=source, line_width=2.5, color=_BLUE)
-        p.varea("x", "y_base", "y", source=source, fill_alpha=0.12, fill_color=_BLUE)
+        p.line("x", "y", source=source, line_width=2.5, color=BLUE)
+        p.varea("x", "y_base", "y", source=source, fill_alpha=0.12, fill_color=BLUE)
 
         # Latest-price annotation
         price_label = Label(
             x=init["x"][-1],
             y=init["y"][-1],
             text=f"  {init['y'][-1]:,.2f}p",
-            text_color=_BLUE,
+            text_color=BLUE,
             text_font_size="11px",
             text_font="Segoe UI, Arial, sans-serif",
             text_font_style="bold",
@@ -203,14 +168,14 @@ class BokehChartRenderer(ChartRenderer):
             labels=model.period_labels,
             active=model.period_labels.index(init_label),
             width=400,
-            stylesheets=[InlineStyleSheet(css=_BTN_CSS)],
+            stylesheets=[InlineStyleSheet(css=BTN_CSS)],
         )
 
         # --- JavaScript callback: switch period ---
         # Title HTML template (mirrors _title_html; kept in JS for instant updates).
         _js_title_tmpl = (
             f"'<div style=\"width:1100px;\">"
-            f"<div style=\"background:linear-gradient(180deg,{_BLUE} 0%,{_DARK_BLUE} 100%);"
+            f"<div style=\"background:linear-gradient(180deg,{BLUE} 0%,{DARK_BLUE} 100%);"
             f"padding:10px 16px;border-radius:4px 4px 0 0;display:flex;"
             f"justify-content:space-between;align-items:center;\">"
             f"<span style=\"color:white;font-family:Segoe UI,Arial,sans-serif;"
@@ -262,5 +227,4 @@ source.change.emit();
         )
         btn_group.js_on_change("active", callback)
 
-        page_css = Div(text=_PAGE_CSS)
-        show(column(page_css, title_div, p, btn_group))
+        show(column(page_css_div(), title_div, p, btn_group))
