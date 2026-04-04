@@ -12,58 +12,110 @@ _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-from bokeh.models import ColumnDataSource, DataTable, TableColumn, HTMLTemplateFormatter, Div
+from bokeh.models import (
+    ColumnDataSource, DataTable, TableColumn, HTMLTemplateFormatter, Div,
+    InlineStyleSheet,
+)
 from bokeh.layouts import column
 from bokeh.io import show
 
 from fund_value_table_renderer import ValueTableModel, ValueTableRenderer
-from fund_constants import HEADER_BG, TOTAL_BG, TOTAL_FG
+from fund_constants import HEADER_BG, TOTAL_BG, TOTAL_FG, ROW_BG_ODD, ROW_BG_EVEN, ROW_FG
 
-# Cell template: applies per-row style stored in the `row_style` source column.
+# Cell template: per-row inline style comes from the `row_style` source column.
+# height:100% ensures the div covers the full SlickGrid row background.
 _CELL_TEMPLATE = """
-<div style="<%= row_style %>; padding: 2px 6px; overflow: hidden; text-overflow: ellipsis;">
+<div style="<%= row_style %>; height: 100%; padding: 4px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box;">
   <%= value %>
 </div>
 """
 
-# Injected CSS: styles the DataTable header rows to match the project palette.
-_HEADER_CSS = f"""
-<style>
+# Injected into the shadow DOM of each DataTable via stylesheets=.
+# This is the only reliable way to reach SlickGrid internals in Bokeh 3.x.
+_TABLE_CSS = f"""
+  .slick-header-columns {{
+    background: {HEADER_BG} !important;
+  }}
   .slick-header-column {{
-    background-color: {HEADER_BG} !important;
+    background: linear-gradient(180deg, {HEADER_BG} 0%, #003d7a 100%) !important;
     color: white !important;
-    font-weight: bold !important;
-    font-size: 12px !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    border-right: 1px solid rgba(255,255,255,0.2) !important;
   }}
-  .bk-data-table {{
-    font-size: 12px;
-    font-family: sans-serif;
+  .slick-header-column:hover {{
+    background: linear-gradient(180deg, #1a6fc4 0%, #004f9a 100%) !important;
   }}
+  .slick-cell {{
+    border-right: 1px solid #b0c4de !important;
+    border-bottom: 1px solid #b0c4de !important;
+    box-sizing: border-box;
+  }}
+  .slick-row {{
+    border-left: 1px solid #b0c4de !important;
+  }}
+  :host {{
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    color: {ROW_FG};
+    border: 1px solid #b0c4de;
+  }}
+"""
+
+# Light-DOM CSS: only body-level styles that don't need shadow-DOM access.
+_PAGE_CSS = """
+<style>
+  body {
+    background-color: #f0f4f8;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 16px;
+  }
 </style>
 """
 
-_ROW_H = 28       # px per data row
-_HEADER_H = 30    # px for the header row
+_ROW_H = 30       # px per data row
+_HEADER_H = 32    # px for the header row
 
+
+def _make_stylesheet() -> InlineStyleSheet:
+    """Return a fresh InlineStyleSheet instance (each widget needs its own)."""
+    return InlineStyleSheet(css=_TABLE_CSS)
+
+
+_SEP_STYLE = "background-color: #f0f4f8; pointer-events: none;"
 
 def _build_source_and_columns(
     headers: list[str],
     data_rows: list[list[str]],
     total_row: list[str],
-) -> tuple[ColumnDataSource, list[TableColumn]]:
-    """Pack rows + total into a ColumnDataSource and return paired TableColumn list."""
+    categories: list[str] | None = None,
+) -> tuple[ColumnDataSource, list[TableColumn], int]:
+    """Pack rows + total into a ColumnDataSource and return (source, columns, n_separators)."""
     keys = [f"c{i}" for i in range(len(headers))]
 
     source_data: dict[str, list] = {k: [] for k in keys}
     source_data["row_style"] = []
 
-    normal_style = ""
-    total_style = f"font-weight: bold; background-color: {TOTAL_BG}; color: {TOTAL_FG};"
+    total_style = f"font-weight: 700; background-color: {TOTAL_BG}; color: {TOTAL_FG}; font-size: 13px;"
+    odd_style   = f"background-color: {ROW_BG_ODD};  color: {ROW_FG};"
+    even_style  = f"background-color: {ROW_BG_EVEN}; color: {ROW_FG};"
 
-    for row in data_rows:
+    n_separators = 0
+    display_row = 0   # counts only real rows, so alternating colours ignore separators
+    for i, row in enumerate(data_rows):
+        # Insert a blank separator row when the category changes (skip before first row)
+        if categories and i > 0 and categories[i] != categories[i - 1]:
+            for k in keys:
+                source_data[k].append("")
+            source_data["row_style"].append(_SEP_STYLE)
+            n_separators += 1
+
         for k, v in zip(keys, row):
             source_data[k].append(v)
-        source_data["row_style"].append(normal_style)
+        source_data["row_style"].append(odd_style if display_row % 2 == 0 else even_style)
+        display_row += 1
 
     for k, v in zip(keys, total_row):
         source_data[k].append(v)
@@ -75,19 +127,19 @@ def _build_source_and_columns(
         TableColumn(field=k, title=h, formatter=HTMLTemplateFormatter(template=_CELL_TEMPLATE))
         for k, h in zip(keys, headers)
     ]
-    return source, table_cols
+    return source, table_cols, n_separators
 
 
-def _table_height(n_data_rows: int) -> int:
+def _table_height(n_data_rows: int, n_separators: int = 0) -> int:
     """Height in px to show all rows without a scrollbar."""
-    return _HEADER_H + (n_data_rows + 1) * _ROW_H + 8   # +1 for total row, 8px buffer
+    return _HEADER_H + (n_data_rows + 1 + n_separators) * _ROW_H + 8
 
 
 class BokehValueTableRenderer(ValueTableRenderer):
     def render(self, model: ValueTableModel) -> None:
         # --- Main fund table ---
-        main_source, main_cols = _build_source_and_columns(
-            model.col_headers, model.rows, model.total_row
+        main_source, main_cols, main_seps = _build_source_and_columns(
+            model.col_headers, model.rows, model.total_row, categories=model.categories
         )
         main_table = DataTable(
             source=main_source,
@@ -95,13 +147,14 @@ class BokehValueTableRenderer(ValueTableRenderer):
             index_position=None,
             header_row=True,
             row_height=_ROW_H,
-            height=_table_height(len(model.rows)),
+            height=_table_height(len(model.rows), main_seps),
             width=1380,
             sizing_mode="fixed",
+            stylesheets=[_make_stylesheet()],
         )
 
         # --- Category summary table ---
-        cat_source, cat_cols = _build_source_and_columns(
+        cat_source, cat_cols, _ = _build_source_and_columns(
             model.cat_col_headers, model.cat_data_rows, model.cat_total_row
         )
         cat_table = DataTable(
@@ -113,16 +166,29 @@ class BokehValueTableRenderer(ValueTableRenderer):
             height=_table_height(len(model.cat_data_rows)),
             width=870,
             sizing_mode="fixed",
+            stylesheets=[_make_stylesheet()],
         )
 
-        css = Div(text=_HEADER_CSS)
+        page_css = Div(text=_PAGE_CSS)
         title = Div(
-            text=f'<h2 style="color:{HEADER_BG}; font-family:sans-serif; margin:8px 0 4px 0;">'
-                 "Fund Portfolio</h2>"
+            text=(
+                f'<div style="width:1380px;">'
+                f'<div style="background:linear-gradient(180deg,{HEADER_BG} 0%,#003d7a 100%); '
+                f'padding:10px 16px; border-radius:4px 4px 0 0; text-align:center;">'
+                f'<span style="color:white; font-family:\'Segoe UI\',Arial,sans-serif; '
+                f'font-size:14px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">'
+                f'Fund Portfolio</span></div></div>'
+            )
         )
         cat_title = Div(
-            text=f'<h3 style="color:{HEADER_BG}; font-family:sans-serif; margin:16px 0 4px 0;">'
-                 "By Category</h3>"
+            text=(
+                f'<div style="width:870px; margin-top:24px;">'
+                f'<div style="background:linear-gradient(180deg,{HEADER_BG} 0%,#003d7a 100%); '
+                f'padding:10px 16px; border-radius:4px 4px 0 0; text-align:center;">'
+                f'<span style="color:white; font-family:\'Segoe UI\',Arial,sans-serif; '
+                f'font-size:14px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">'
+                f'By Category</span></div></div>'
+            )
         )
 
-        show(column(css, title, main_table, cat_title, cat_table))
+        show(column(page_css, title, main_table, cat_title, cat_table))
