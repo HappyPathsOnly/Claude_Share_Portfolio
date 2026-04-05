@@ -1,10 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
-import { pathToFileURL } from 'url';
-import * as path from 'path';
+import { htmlFileUrl } from './helpers';
 
-const HTML_FILE = pathToFileURL(
-  path.resolve(__dirname, '../../../fund_chart.html')
-).href;
+const HTML_FILE = htmlFileUrl('fund_chart.html');
 
 // Period labels as defined in fund_chart.py › PERIODS
 const PERIOD_LABELS = ['1M', '3M', '6M', '1Y', '3Y', '5Y', '10Y'];

@@ -1,10 +1,7 @@
-import { test, expect, Page } from '@playwright/test';
-import { pathToFileURL } from 'url';
-import * as path from 'path';
+import { test, expect } from '@playwright/test';
+import { htmlFileUrl, waitForGrid } from './helpers';
 
-const HTML_FILE = pathToFileURL(
-  path.resolve(__dirname, '../../../fund_table.html')
-).href;
+const HTML_FILE = htmlFileUrl('fund_table.html');
 
 // Column headers as defined in fund_table.py › build_table_model()
 const MAIN_HEADERS = [
@@ -19,10 +16,6 @@ const CAT_HEADERS = [
   'Prev Day', 'Value',
 ];
 
-// Wait for SlickGrid to finish rendering inside the Bokeh shadow DOM.
-async function waitForGrid(page: Page): Promise<void> {
-  await page.waitForSelector('.slick-viewport', { state: 'visible', timeout: 30_000 });
-}
 
 test.beforeEach(async ({ page }) => {
   await page.goto(HTML_FILE);

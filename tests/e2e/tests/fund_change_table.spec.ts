@@ -1,10 +1,7 @@
-import { test, expect, Page } from '@playwright/test';
-import { pathToFileURL } from 'url';
-import * as path from 'path';
+import { test, expect } from '@playwright/test';
+import { htmlFileUrl, waitForGrid } from './helpers';
 
-const HTML_FILE = pathToFileURL(
-  path.resolve(__dirname, '../../../fund_change_table.html')
-).href;
+const HTML_FILE = htmlFileUrl('fund_change_table.html');
 
 // Column headers as defined in fund_change_table.py › build_table_model()
 const EXPECTED_HEADERS = [
@@ -13,9 +10,6 @@ const EXPECTED_HEADERS = [
   'Prev Day', 'Value',
 ];
 
-async function waitForGrid(page: Page): Promise<void> {
-  await page.waitForSelector('.slick-viewport', { state: 'visible', timeout: 30_000 });
-}
 
 test.beforeEach(async ({ page }) => {
   await page.goto(HTML_FILE);
