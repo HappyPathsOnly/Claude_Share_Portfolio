@@ -16,14 +16,27 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 
 ## Screenshots
 
-### Fund Chart (`fund_chart.py`)
+### Matplotlib
+
+#### Fund Chart (`fund_chart.py`)
 ![Fund Chart](images/fund_chart02_04_2026.jpg)
 
-### Fund Value Table (`fund_table.py`)
+#### Fund Value Table (`fund_table.py`)
 ![Fund Table](images/fund_table02_04_2026.jpg)
 
-### Fund Change Table (`fund_change_table.py`)
+#### Fund Change Table (`fund_change_table.py`)
 ![Fund Change Table](images/fund_change_table_02_04_2026.jpg)
+
+### Bokeh
+
+#### Fund Chart (`fund_chart.py --bokeh`)
+![Fund Chart Bokeh](images/fund_chart_bokeh05_04_2026.jpg)
+
+#### Fund Value Table (`fund_table.py --bokeh`)
+![Fund Table Bokeh](images/fund_table_bokeh05_04_2026.jpg)
+
+#### Fund Change Table (`fund_change_table.py --bokeh`)
+![Fund Change Table Bokeh](images/fund_change_table_bokeh05_04_2026.jpg)
 
 ## Project Structure
 
