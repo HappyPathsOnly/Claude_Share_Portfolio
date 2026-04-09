@@ -15,9 +15,11 @@ sys.path.insert(0, ROOT)
 from fund_utils import CSV_PATH, load_funds
 from fund_table import build_table_model as build_value_model
 from fund_change_table import build_table_model as build_change_model
+from fund_volatility_table import build_table_model as build_volatility_model
 from fund_chart import build_chart_model
 from GUI.Bokeh.fund_value_table_bokeh import BokehValueTableRenderer
 from GUI.Bokeh.fund_change_table_bokeh import BokehChangeTableRenderer
+from GUI.Bokeh.fund_volatility_table_bokeh import BokehVolatilityTableRenderer
 from GUI.Bokeh.fund_chart_bokeh import BokehChartRenderer
 
 
@@ -35,6 +37,12 @@ def generate_all() -> None:
     BokehChangeTableRenderer().render(
         build_change_model(funds),
         output_path=os.path.join(ROOT, "fund_change_table.html"),
+    )
+
+    print("Generating fund_volatility_table.html...")
+    BokehVolatilityTableRenderer().render(
+        build_volatility_model(funds),
+        output_path=os.path.join(ROOT, "fund_volatility_table.html"),
     )
 
     print("Generating fund_chart.html...")

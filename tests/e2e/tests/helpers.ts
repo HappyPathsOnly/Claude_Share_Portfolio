@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { pathToFileURL } from 'url';
 import * as path from 'path';
 
@@ -10,4 +10,8 @@ export function htmlFileUrl(filename: string): string {
 /** Wait for SlickGrid to finish rendering inside the Bokeh shadow DOM. */
 export async function waitForGrid(page: Page): Promise<void> {
   await page.waitForSelector('.slick-viewport', { state: 'visible', timeout: 30_000 });
+}
+
+export async function waitForChart(page: Page) {
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 60_000 });
 }
