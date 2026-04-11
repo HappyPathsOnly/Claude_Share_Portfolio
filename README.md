@@ -134,7 +134,7 @@ cd tests/e2e
 npm test
 ```
 
-The global setup step runs `generate_html.py` automatically — this fetches live data and writes the HTML files before Playwright opens them. Expect the first run to take a couple of minutes due to the network calls.
+The global setup step runs `tests/e2e/generate_html.py` automatically — this fetches live data and writes the HTML files before Playwright opens them. Expect the first run to take a couple of minutes due to the network calls.
 
 To run in headed mode (watch the browser):
 
