@@ -17,16 +17,6 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 
 ## Screenshots
 
-### Matplotlib
-
-#### Fund Value Table (`fund_table.py`)
-![Fund Table](images/fund_table02_04_2026.jpg)
-
-#### Fund Change Table (`fund_change_table.py`)
-![Fund Change Table](images/fund_change_table_02_04_2026.jpg)
-
-### Bokeh
-
 #### Fund Value Table (`fund_table.py --bokeh`)
 ![Fund Table Bokeh](images/fund_table_bokeh05_04_2026.jpg)
 
@@ -70,13 +60,7 @@ The project is organised into four layers following a **model/renderer split** �
 
 ### Renderer Implementations (Matplotlib)
 
-Located in `GUI/Matplotlib/`. Each file implements the same renderer interface as its Bokeh counterpart.
-
-| File | Description |
-|------|-------------|
-| `GUI/Matplotlib/fund_table_matplotlib.py` | `MatplotlibTableRenderer` — draws the percentage change table |
-| `GUI/Matplotlib/fund_value_table_matplotlib.py` | `MatplotlibValueTableRenderer` — draws the absolute value and category summary tables |
-| `GUI/Matplotlib/fund_matplotlib_utils.py` | Shared matplotlib helpers: cell drawing, column position calculation |
+A Matplotlib implementation exists in `GUI/Matplotlib/` but is not documented here.
 
 ### Renderer Implementations (Bokeh)
 
@@ -106,7 +90,7 @@ Entry point  →  builds a Model  →  passes it to a Renderer
 
 ### 1. Models (pure data)
 
-Each display mode has a corresponding dataclass — `TableModel`, `ValueTableModel` — that holds only the data needed for rendering: rows, headers, callbacks, etc. Models contain no GUI code and can be constructed and tested without touching matplotlib.
+Each display mode has a corresponding dataclass — `TableModel`, `ValueTableModel` — that holds only the data needed for rendering: rows, headers, callbacks, etc. Models contain no GUI code and can be constructed and tested without touching any rendering backend.
 
 ### 2. Renderer abstractions (interfaces)
 
@@ -114,12 +98,12 @@ Each model has a paired abstract base class — `TableRenderer`, `ValueTableRend
 
 ### 3. Renderer implementations (GUI)
 
-The `*_matplotlib.py` files and the `GUI/Bokeh/*_bokeh.py` files contain all framework-specific code. They implement the abstract renderer interfaces and are the only place that knows about the GUI framework. Adding a new backend (e.g. a terminal renderer or a web framework) requires only a new implementation file — the models and entry points remain untouched.
+The `GUI/Bokeh/*_bokeh.py` files contain all framework-specific code. They implement the abstract renderer interfaces and are the only place that knows about the GUI framework. Adding a new backend (e.g. a terminal renderer or a web framework) requires only a new implementation file — the models and entry points remain untouched.
 
 ### Why this structure?
 
 - **Testability** — model-building logic can be tested independently of any GUI
-- **Replaceability** — swapping matplotlib for another backend (Qt, web, terminal) only requires a new `*_renderer.py` implementation; the models and entry points are untouched
+- **Replaceability** — swapping the rendering backend (Qt, web, terminal) only requires a new implementation file; the models and entry points are untouched
 - **Single responsibility** — data fetching, model building, and rendering each live in their own layer
 
 ## Testing
@@ -168,7 +152,6 @@ npm run report
 
 - **Python**
 - **[yfinance](https://github.com/ranaroussi/yfinance)** — fetches live pricing data from Yahoo Finance
-- **[matplotlib](https://matplotlib.org/)** — renders charts and tables
 - **[bokeh](https://docs.bokeh.org/en/latest/)** — renders interactive browser-based charts and tables
 - **[Claude](https://claude.ai/)** — AI assistant used to develop this project
 
@@ -186,32 +169,30 @@ pip install -r requirements.txt
 
 ### Running
 
-Each entry point defaults to the matplotlib renderer. Pass `--bokeh` to open the browser-based Bokeh version instead.
+Each entry point opens the browser-based Bokeh version. Pass `--bokeh` explicitly or omit it — both work.
 
 **Absolute value table:**
 
 ```bash
-python fund_table.py           # matplotlib
-python fund_table.py --bokeh   # Bokeh (browser)
+python fund_table.py --bokeh
 ```
 
 **Percentage change table:**
 
 ```bash
-python fund_change_table.py           # matplotlib
-python fund_change_table.py --bokeh   # Bokeh (browser)
+python fund_change_table.py --bokeh
 ```
 
 **Historical volatility table:**
 
 ```bash
-python fund_volatility_table.py --bokeh   # Bokeh only
+python fund_volatility_table.py --bokeh
 ```
 
 **Max-drawdown table:**
 
 ```bash
-python fund_drawdown_table.py --bokeh   # Bokeh only
+python fund_drawdown_table.py --bokeh
 ```
 
 ## Adding Funds
