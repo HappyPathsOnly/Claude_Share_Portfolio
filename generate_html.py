@@ -1,8 +1,9 @@
 """
-Generates all three Bokeh HTML output files without opening a browser:
+Generates all Bokeh HTML output files without opening a browser:
   fund_table.html          – current fund values
   fund_change_table.html   – percentage changes
-  fund_chart.html          – price chart
+  fund_volatility_table.html – historical volatility
+  fund_drawdown_table.html – max drawdown
 
 Run directly or via the Playwright e2e global setup.
 """
@@ -17,12 +18,10 @@ from fund_table import build_table_model as build_value_model
 from fund_change_table import build_table_model as build_change_model
 from fund_volatility_table import build_table_model as build_volatility_model
 from fund_drawdown_table import build_table_model as build_drawdown_model
-from fund_chart import build_chart_model
 from GUI.Bokeh.fund_value_table_bokeh import BokehValueTableRenderer
 from GUI.Bokeh.fund_change_table_bokeh import BokehChangeTableRenderer
 from GUI.Bokeh.fund_volatility_table_bokeh import BokehVolatilityTableRenderer
 from GUI.Bokeh.fund_drawdown_table_bokeh import BokehDrawdownTableRenderer
-from GUI.Bokeh.fund_chart_bokeh import BokehChartRenderer
 
 
 def generate_all() -> None:
@@ -51,12 +50,6 @@ def generate_all() -> None:
     BokehDrawdownTableRenderer().render(
         build_drawdown_model(funds),
         output_path=os.path.join(ROOT, "fund_drawdown_table.html"),
-    )
-
-    print("Generating fund_chart.html...")
-    BokehChartRenderer().render(
-        build_chart_model(),
-        output_path=os.path.join(ROOT, "fund_chart.html"),
     )
 
     print("All HTML files generated.")

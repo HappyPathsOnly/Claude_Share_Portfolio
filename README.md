@@ -8,7 +8,6 @@ Initial code is generated with Claude Code.
 
 This project retrieves up-to-date pricing data for investment funds and displays it in four ways:
 
-- **fund_chart.py** — interactive price chart with selectable time periods (1M to 10Y)
 - **fund_table.py** — portfolio table showing fund value at previous day, 1 week, 1 month, 6 months, 1 year, and current value, with a total row and a category summary table below
 - **fund_change_table.py** — portfolio table showing percentage change over the same time periods, with gains in green and losses in red
 - **fund_volatility_table.py** — portfolio table showing annualised historical volatility over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped from green (low) through amber to red (high)
@@ -20,9 +19,6 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 
 ### Matplotlib
 
-#### Fund Chart (`fund_chart.py`)
-![Fund Chart](images/fund_chart02_04_2026.jpg)
-
 #### Fund Value Table (`fund_table.py`)
 ![Fund Table](images/fund_table02_04_2026.jpg)
 
@@ -30,9 +26,6 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 ![Fund Change Table](images/fund_change_table_02_04_2026.jpg)
 
 ### Bokeh
-
-#### Fund Chart (`fund_chart.py --bokeh`)
-![Fund Chart Bokeh](images/fund_chart_bokeh05_04_2026.jpg)
 
 #### Fund Value Table (`fund_table.py --bokeh`)
 ![Fund Table Bokeh](images/fund_table_bokeh05_04_2026.jpg)
@@ -54,7 +47,6 @@ The project is organised into four layers following a **model/renderer split** �
 
 | File | Description |
 |------|-------------|
-| `fund_chart.py` | Builds the chart model and launches the interactive price chart |
 | `fund_table.py` | Builds the value table model and launches the absolute value table |
 | `fund_change_table.py` | Builds the change table model and launches the percentage change table |
 | `fund_volatility_table.py` | Builds the volatility table model and launches the historical volatility table |
@@ -71,7 +63,6 @@ The project is organised into four layers following a **model/renderer split** �
 
 | File | Description |
 |------|-------------|
-| `fund_chart_renderer.py` | Abstract `ChartRenderer` base class and `ChartModel` dataclass |
 | `fund_table_renderer.py` | Abstract `TableRenderer` base class and `TableModel` dataclass |
 | `fund_value_table_renderer.py` | Abstract `ValueTableRenderer` base class and `ValueTableModel` dataclass |
 | `fund_volatility_table_renderer.py` | Abstract `VolatilityTableRenderer` base class and `VolatilityTableModel` dataclass |
@@ -83,7 +74,6 @@ Located in `GUI/Matplotlib/`. Each file implements the same renderer interface a
 
 | File | Description |
 |------|-------------|
-| `GUI/Matplotlib/fund_chart_matplotlib.py` | `MatplotlibChartRenderer` — draws the interactive line chart |
 | `GUI/Matplotlib/fund_table_matplotlib.py` | `MatplotlibTableRenderer` — draws the percentage change table |
 | `GUI/Matplotlib/fund_value_table_matplotlib.py` | `MatplotlibValueTableRenderer` — draws the absolute value and category summary tables |
 | `GUI/Matplotlib/fund_matplotlib_utils.py` | Shared matplotlib helpers: cell drawing, column position calculation |
@@ -94,7 +84,6 @@ Located in `GUI/Bokeh/`. Each file implements the same renderer interface as its
 
 | File | Description |
 |------|-------------|
-| `GUI/Bokeh/fund_chart_bokeh.py` | `BokehChartRenderer` — interactive price chart with period buttons; pre-fetches all periods and switches instantly in the browser |
 | `GUI/Bokeh/fund_change_table_bokeh.py` | `BokehChangeTableRenderer` — percentage change table with green/red colouring on gain/loss cells |
 | `GUI/Bokeh/fund_value_table_bokeh.py` | `BokehValueTableRenderer` — absolute value table plus category summary table |
 | `GUI/Bokeh/fund_volatility_table_bokeh.py` | `BokehVolatilityTableRenderer` — historical volatility table with heat-map colouring (green < 10 %, amber 10–20 %, red > 20 %) plus category summary table |
@@ -117,11 +106,11 @@ Entry point  →  builds a Model  →  passes it to a Renderer
 
 ### 1. Models (pure data)
 
-Each display mode has a corresponding dataclass — `ChartModel`, `TableModel`, `ValueTableModel` — that holds only the data needed for rendering: rows, headers, callbacks, etc. Models contain no GUI code and can be constructed and tested without touching matplotlib.
+Each display mode has a corresponding dataclass — `TableModel`, `ValueTableModel` — that holds only the data needed for rendering: rows, headers, callbacks, etc. Models contain no GUI code and can be constructed and tested without touching matplotlib.
 
 ### 2. Renderer abstractions (interfaces)
 
-Each model has a paired abstract base class — `ChartRenderer`, `TableRenderer`, `ValueTableRenderer`, `VolatilityTableRenderer` — that declares a single `render(model)` method. These are the contracts that any rendering backend must fulfil.
+Each model has a paired abstract base class — `TableRenderer`, `ValueTableRenderer`, `VolatilityTableRenderer` — that declares a single `render(model)` method. These are the contracts that any rendering backend must fulfil.
 
 ### 3. Renderer implementations (GUI)
 
@@ -143,7 +132,6 @@ End-to-end tests are written in TypeScript using [Playwright](https://playwright
 |-----------|----------------|
 | `tests/fund_table.spec.ts` | Title bars ("Fund Portfolio", "By Category"), all 9 column headers, presence of data rows and total row in both the main and category tables |
 | `tests/fund_change_table.spec.ts` | Title bar, all 9 column headers, presence of data rows and total row |
-| `tests/fund_chart.spec.ts` | Fund name in title, all 7 period buttons (1M–10Y), chart canvas rendered |
 
 ### Setup
 
@@ -212,13 +200,6 @@ python fund_table.py --bokeh   # Bokeh (browser)
 ```bash
 python fund_change_table.py           # matplotlib
 python fund_change_table.py --bokeh   # Bokeh (browser)
-```
-
-**Interactive price chart:**
-
-```bash
-python fund_chart.py           # matplotlib
-python fund_chart.py --bokeh   # Bokeh (browser, pre-fetches all periods)
 ```
 
 **Historical volatility table:**
