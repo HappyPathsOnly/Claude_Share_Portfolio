@@ -4,7 +4,7 @@ Displays current fund values in a tabular format.
 """
 
 from collections import defaultdict
-from fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
+from utils.fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
 from fund_value_table_renderer import ValueTableModel, ValueTableRenderer
 
 

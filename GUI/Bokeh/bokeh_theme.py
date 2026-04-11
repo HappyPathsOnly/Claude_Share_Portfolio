@@ -21,7 +21,7 @@ if _ROOT not in sys.path:
 
 from bokeh.models import Div, InlineStyleSheet
 
-from fund_constants import HEADER_BG, TOTAL_BG, TOTAL_FG, ROW_BG_ODD, ROW_BG_EVEN, ROW_FG
+from utils.fund_constants import HEADER_BG, TOTAL_BG, TOTAL_FG, ROW_BG_ODD, ROW_BG_EVEN, ROW_FG
 
 # ---------------------------------------------------------------------------
 # Colour palette

@@ -10,7 +10,7 @@ if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
 import matplotlib.pyplot as plt
-from fund_constants import CELL_PADDING, FONT_SIZE, BORDER_WIDTH, BORDER, TABLE_LEFT
+from utils.fund_constants import CELL_PADDING, FONT_SIZE, BORDER_WIDTH, BORDER, TABLE_LEFT
 
 
 def draw_cell(ax, x, y, w, h, text, bg, fg, align, fontsize=FONT_SIZE, bold=False):

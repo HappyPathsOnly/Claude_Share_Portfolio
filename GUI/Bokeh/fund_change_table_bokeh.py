@@ -26,7 +26,7 @@ except ImportError as exc:
     ) from exc
 
 from fund_table_renderer import TableModel, TableRenderer
-from fund_constants import ROW_FG, GREEN, RED
+from utils.fund_constants import ROW_FG, GREEN, RED
 from bokeh_theme import (
     ROW_H, SEP_STYLE, CELL_TEMPLATE,
     TOTAL_STYLE, ODD_STYLE, EVEN_STYLE,

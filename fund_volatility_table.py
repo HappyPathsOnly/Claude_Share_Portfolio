@@ -10,7 +10,7 @@ import pandas
 import yfinance as yf
 from collections import defaultdict
 
-from fund_utils import CSV_PATH, load_funds
+from utils.fund_utils import CSV_PATH, load_funds
 from fund_volatility_table_renderer import VolatilityTableModel, VolatilityTableRenderer
 
 PERIODS = ["1M", "3M", "6M", "1Y", "3Y", "5Y"]

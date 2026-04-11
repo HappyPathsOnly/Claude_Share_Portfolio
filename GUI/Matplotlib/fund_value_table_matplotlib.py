@@ -11,7 +11,7 @@ if _ROOT not in sys.path:
 
 import matplotlib.pyplot as plt
 from fund_value_table_renderer import ValueTableModel, ValueTableRenderer
-from fund_constants import (
+from utils.fund_constants import (
     HEADER_BG, HEADER_FG, ROW_BG_ODD, ROW_BG_EVEN, TOTAL_BG, TOTAL_FG,
     ROW_FG, TABLE_TOP, TABLE_LEFT, FONT_SIZE, TITLE_FONT_SIZE,
 )

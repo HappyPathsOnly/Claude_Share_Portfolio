@@ -11,7 +11,7 @@ if _ROOT not in sys.path:
 
 import matplotlib.pyplot as plt
 from fund_table_renderer import TableModel, TableRenderer
-from fund_constants import (
+from utils.fund_constants import (
     HEADER_BG, HEADER_FG, ROW_BG_ODD, ROW_BG_EVEN, TOTAL_BG, TOTAL_FG,
     ROW_FG, GREEN, RED, TABLE_TOP, FONT_SIZE, TITLE_FONT_SIZE,
 )

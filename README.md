@@ -64,8 +64,8 @@ The project is organised into four layers following a **model/renderer split** â
 
 | File | Description |
 |------|-------------|
-| `fund_utils.py` | Shared data loading (`load_funds`) and price fetching (`fetch_prices_gbp`) |
-| `fund_constants.py` | Shared styling and layout constants (colours, font sizes, row heights) |
+| `utils/fund_utils.py` | Shared data loading (`load_funds`) and price fetching (`fetch_prices_gbp`) |
+| `utils/fund_constants.py` | Shared styling and layout constants (colours, font sizes, row heights) |
 
 ### Renderer Abstractions
 

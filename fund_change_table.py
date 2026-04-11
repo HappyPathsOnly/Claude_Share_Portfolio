@@ -3,7 +3,7 @@ Fund Portfolio - Percentage Change Table
 Shows percentage change in fund value over various time periods relative to current value.
 """
 
-from fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
+from utils.fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
 from fund_table_renderer import TableModel, TableRenderer
 
 

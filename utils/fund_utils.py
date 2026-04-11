@@ -18,10 +18,10 @@ _OFFSETS = {
     "5Y": pandas.DateOffset(years=5),
 }
 
-_dir = os.path.dirname(__file__)
-CSV_PATH = os.path.join(_dir, "funds.csv")
+_root = os.path.dirname(os.path.dirname(__file__))
+CSV_PATH = os.path.join(_root, "funds.csv")
 if not os.path.exists(CSV_PATH):
-    CSV_PATH = os.path.join(_dir, "funds.example.csv")
+    CSV_PATH = os.path.join(_root, "funds.example.csv")
 
 
 def load_funds(csv_path: str) -> list:

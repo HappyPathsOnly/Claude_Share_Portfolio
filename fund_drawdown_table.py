@@ -9,7 +9,7 @@ Values are expressed as negative percentages (e.g. -15.30 %).
 import pandas
 import yfinance as yf
 
-from fund_utils import CSV_PATH, load_funds, _max_drawdown_calculation, _OFFSETS
+from utils.fund_utils import CSV_PATH, load_funds, _max_drawdown_calculation, _OFFSETS
 from fund_drawdown_table_renderer import DrawdownTableModel, DrawdownTableRenderer
 
 PERIODS = ["1M", "3M", "6M", "1Y", "3Y", "5Y"]

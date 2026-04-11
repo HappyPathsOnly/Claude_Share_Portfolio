@@ -12,7 +12,7 @@ import os
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 
-from fund_utils import CSV_PATH, load_funds
+from utils.fund_utils import CSV_PATH, load_funds
 from fund_table import build_table_model as build_value_model
 from fund_change_table import build_table_model as build_change_model
 from fund_volatility_table import build_table_model as build_volatility_model
