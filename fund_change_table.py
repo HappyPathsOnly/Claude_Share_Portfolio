@@ -75,12 +75,12 @@ def main(renderer: TableRenderer):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Fund percentage-change table")
-    parser.add_argument("--bokeh", action="store_true", help="Use Bokeh renderer (opens in browser)")
+    parser.add_argument("--matplotlib", action="store_true", help="Use Matplotlib renderer (opens a window)")
     args = parser.parse_args()
 
-    if args.bokeh:
-        from GUI.Bokeh.fund_change_table_bokeh import BokehChangeTableRenderer
-        main(BokehChangeTableRenderer())
-    else:
+    if args.matplotlib:
         from GUI.Matplotlib.fund_table_matplotlib import MatplotlibTableRenderer
         main(MatplotlibTableRenderer())
+    else:
+        from GUI.Bokeh.fund_change_table_bokeh import BokehChangeTableRenderer
+        main(BokehChangeTableRenderer())

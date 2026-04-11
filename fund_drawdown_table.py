@@ -88,11 +88,7 @@ def main(renderer: DrawdownTableRenderer):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Fund max-drawdown table")
-    parser.add_argument("--bokeh", action="store_true", help="Use Bokeh renderer (opens in browser)")
     args = parser.parse_args()
 
-    if args.bokeh:
-        from GUI.Bokeh.fund_drawdown_table_bokeh import BokehDrawdownTableRenderer
-        main(BokehDrawdownTableRenderer())
-    else:
-        raise NotImplementedError("Only the Bokeh renderer is implemented for the drawdown table.")
+    from GUI.Bokeh.fund_drawdown_table_bokeh import BokehDrawdownTableRenderer
+    main(BokehDrawdownTableRenderer())

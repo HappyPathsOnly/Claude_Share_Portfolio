@@ -17,16 +17,16 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 
 ## Screenshots
 
-#### Fund Value Table (`fund_table.py --bokeh`)
+#### Fund Value Table (`fund_table.py`)
 ![Fund Table Bokeh](images/fund_table_bokeh05_04_2026.jpg)
 
-#### Fund Change Table (`fund_change_table.py --bokeh`)
+#### Fund Change Table (`fund_change_table.py`)
 ![Fund Change Table Bokeh](images/fund_change_table_bokeh05_04_2026.jpg)
 
-#### Fund Volatility Table (`fund_volatility_table.py --bokeh`)
+#### Fund Volatility Table (`fund_volatility_table.py`)
 ![Fund Volatility Table Bokeh](images/fund_volatility_table_bokeh09_04_2026.jpg)
 
-#### Fund Drawdown Table (`fund_drawdown_table.py --bokeh`)
+#### Fund Drawdown Table (`fund_drawdown_table.py`)
 ![Fund Drawdown Table Bokeh](images/fund_drawdown_table11_04_2026.jpg)
 
 ## Project Structure
@@ -169,30 +169,30 @@ pip install -r requirements.txt
 
 ### Running
 
-Each entry point opens the browser-based Bokeh version. Pass `--bokeh` explicitly or omit it — both work.
+Each entry point defaults to the Bokeh renderer (opens in the browser). Pass `--matplotlib` to use the Matplotlib renderer instead.
 
 **Absolute value table:**
 
 ```bash
-python fund_table.py --bokeh
+python fund_table.py
 ```
 
 **Percentage change table:**
 
 ```bash
-python fund_change_table.py --bokeh
+python fund_change_table.py
 ```
 
 **Historical volatility table:**
 
 ```bash
-python fund_volatility_table.py --bokeh
+python fund_volatility_table.py
 ```
 
 **Max-drawdown table:**
 
 ```bash
-python fund_drawdown_table.py --bokeh
+python fund_drawdown_table.py
 ```
 
 ## Adding Funds

@@ -88,12 +88,12 @@ def main(renderer: ValueTableRenderer):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Fund value table")
-    parser.add_argument("--bokeh", action="store_true", help="Use Bokeh renderer (opens in browser)")
+    parser.add_argument("--matplotlib", action="store_true", help="Use Matplotlib renderer (opens a window)")
     args = parser.parse_args()
 
-    if args.bokeh:
-        from GUI.Bokeh.fund_value_table_bokeh import BokehValueTableRenderer
-        main(BokehValueTableRenderer())
-    else:
+    if args.matplotlib:
         from GUI.Matplotlib.fund_value_table_matplotlib import MatplotlibValueTableRenderer
         main(MatplotlibValueTableRenderer())
+    else:
+        from GUI.Bokeh.fund_value_table_bokeh import BokehValueTableRenderer
+        main(BokehValueTableRenderer())

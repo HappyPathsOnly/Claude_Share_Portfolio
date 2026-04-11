@@ -116,11 +116,7 @@ def main(renderer: VolatilityTableRenderer):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Fund historical volatility table")
-    parser.add_argument("--bokeh", action="store_true", help="Use Bokeh renderer (opens in browser)")
     args = parser.parse_args()
 
-    if args.bokeh:
-        from GUI.Bokeh.fund_volatility_table_bokeh import BokehVolatilityTableRenderer
-        main(BokehVolatilityTableRenderer())
-    else:
-        raise NotImplementedError("Only the Bokeh renderer is implemented for the volatility table.")
+    from GUI.Bokeh.fund_volatility_table_bokeh import BokehVolatilityTableRenderer
+    main(BokehVolatilityTableRenderer())
