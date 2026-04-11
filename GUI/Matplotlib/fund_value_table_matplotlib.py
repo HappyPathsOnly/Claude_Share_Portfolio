@@ -10,7 +10,7 @@ if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
 import matplotlib.pyplot as plt
-from fund_value_table_renderer import ValueTableModel, ValueTableRenderer
+from renderers.fund_value_table_renderer import ValueTableModel, ValueTableRenderer
 from utils.fund_constants import (
     HEADER_BG, HEADER_FG, ROW_BG_ODD, ROW_BG_EVEN, TOTAL_BG, TOTAL_FG,
     ROW_FG, TABLE_TOP, TABLE_LEFT, FONT_SIZE, TITLE_FONT_SIZE,

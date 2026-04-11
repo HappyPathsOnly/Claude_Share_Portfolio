@@ -53,10 +53,10 @@ The project is organised into four layers following a **model/renderer split** â
 
 | File | Description |
 |------|-------------|
-| `fund_table_renderer.py` | Abstract `TableRenderer` base class and `TableModel` dataclass |
-| `fund_value_table_renderer.py` | Abstract `ValueTableRenderer` base class and `ValueTableModel` dataclass |
-| `fund_volatility_table_renderer.py` | Abstract `VolatilityTableRenderer` base class and `VolatilityTableModel` dataclass |
-| `fund_drawdown_table_renderer.py` | Abstract `DrawdownTableRenderer` base class and `DrawdownTableModel` dataclass |
+| `renderers/fund_table_renderer.py` | Abstract `TableRenderer` base class and `TableModel` dataclass |
+| `renderers/fund_value_table_renderer.py` | Abstract `ValueTableRenderer` base class and `ValueTableModel` dataclass |
+| `renderers/fund_volatility_table_renderer.py` | Abstract `VolatilityTableRenderer` base class and `VolatilityTableModel` dataclass |
+| `renderers/fund_drawdown_table_renderer.py` | Abstract `DrawdownTableRenderer` base class and `DrawdownTableModel` dataclass |
 
 ### Renderer Implementations (Matplotlib)
 

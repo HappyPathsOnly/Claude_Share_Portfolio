@@ -5,7 +5,7 @@ Displays current fund values in a tabular format.
 
 from collections import defaultdict
 from utils.fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
-from fund_value_table_renderer import ValueTableModel, ValueTableRenderer
+from renderers.fund_value_table_renderer import ValueTableModel, ValueTableRenderer
 
 
 def build_rows(funds: list) -> tuple:

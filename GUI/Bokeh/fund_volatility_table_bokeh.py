@@ -22,7 +22,7 @@ except ImportError as exc:
         "Missing dependency: bokeh is required. Install it with: pip install bokeh"
     ) from exc
 
-from fund_volatility_table_renderer import VolatilityTableModel, VolatilityTableRenderer
+from renderers.fund_volatility_table_renderer import VolatilityTableModel, VolatilityTableRenderer
 from utils.fund_constants import ROW_FG, GREEN, RED
 from bokeh_theme import (
     ROW_H, SEP_STYLE, CELL_TEMPLATE,

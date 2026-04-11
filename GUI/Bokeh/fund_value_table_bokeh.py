@@ -19,7 +19,7 @@ from bokeh.models import ColumnDataSource, DataTable, TableColumn, HTMLTemplateF
 from bokeh.layouts import column
 from bokeh.io import show
 
-from fund_value_table_renderer import ValueTableModel, ValueTableRenderer
+from renderers.fund_value_table_renderer import ValueTableModel, ValueTableRenderer
 from bokeh_theme import (
     ROW_H, SEP_STYLE, CELL_TEMPLATE,
     TOTAL_STYLE, ODD_STYLE, EVEN_STYLE,

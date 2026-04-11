@@ -10,7 +10,7 @@ import pandas
 import yfinance as yf
 
 from utils.fund_utils import CSV_PATH, load_funds, _max_drawdown_calculation, _OFFSETS
-from fund_drawdown_table_renderer import DrawdownTableModel, DrawdownTableRenderer
+from renderers.fund_drawdown_table_renderer import DrawdownTableModel, DrawdownTableRenderer
 
 PERIODS = ["1M", "3M", "6M", "1Y", "3Y", "5Y"]
 

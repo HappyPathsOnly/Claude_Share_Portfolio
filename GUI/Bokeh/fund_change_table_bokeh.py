@@ -25,7 +25,7 @@ except ImportError as exc:
         "Install it with: pip install bokeh"
     ) from exc
 
-from fund_table_renderer import TableModel, TableRenderer
+from renderers.fund_table_renderer import TableModel, TableRenderer
 from utils.fund_constants import ROW_FG, GREEN, RED
 from bokeh_theme import (
     ROW_H, SEP_STYLE, CELL_TEMPLATE,

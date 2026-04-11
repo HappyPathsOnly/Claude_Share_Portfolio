@@ -4,7 +4,7 @@ Shows percentage change in fund value over various time periods relative to curr
 """
 
 from utils.fund_utils import CSV_PATH, load_funds, fetch_prices_gbp
-from fund_table_renderer import TableModel, TableRenderer
+from renderers.fund_table_renderer import TableModel, TableRenderer
 
 
 def pct_change(current, past) -> str:
