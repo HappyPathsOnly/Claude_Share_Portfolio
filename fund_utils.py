@@ -7,6 +7,17 @@ import os
 import pandas
 import yfinance as yf
 
+PERIODS = ["1M", "3M", "6M", "1Y", "3Y", "5Y"]
+
+_OFFSETS = {
+    "1M": pandas.DateOffset(months=1),
+    "3M": pandas.DateOffset(months=3),
+    "6M": pandas.DateOffset(months=6),
+    "1Y": pandas.DateOffset(years=1),
+    "3Y": pandas.DateOffset(years=3),
+    "5Y": pandas.DateOffset(years=5),
+}
+
 _dir = os.path.dirname(__file__)
 CSV_PATH = os.path.join(_dir, "funds.csv")
 if not os.path.exists(CSV_PATH):
@@ -54,3 +65,29 @@ def fetch_prices_gbp(ticker: str) -> tuple[float, float, float, float, float, fl
         price_at(months=6) / divisor,
         price_at(months=12) / divisor,
     )
+
+
+
+def _max_drawdown_calculation(prices: pandas.Series) -> tuple[float, str]:
+    """Calculate the maximum drawdown over a price series.
+
+    The maximum drawdown is the largest peak-to-trough decline expressed as a
+    percentage of the peak price. It is computed by tracking the running maximum
+    price and measuring how far each subsequent price has fallen from that peak.
+
+    Args:
+        prices: A pandas Series of closing prices indexed by date.
+
+    Returns:
+        A tuple of (drawdown_pct, date_str) where drawdown_pct is the maximum
+        drawdown as a negative percentage (e.g. -15.3) and date_str is the date
+        of the trough formatted as "DD Mon YYYY". Returns (0.0, "N/A") if the
+        series has fewer than two non-NaN values.
+    """
+    prices = prices.dropna()
+    if len(prices) < 2:
+        return 0.0, "N/A"
+    rolling_max = prices.cummax()
+    drawdowns = (prices - rolling_max) / rolling_max * 100
+    min_idx = drawdowns.idxmin()
+    return float(drawdowns.min()), min_idx.strftime("%d %b %Y")
