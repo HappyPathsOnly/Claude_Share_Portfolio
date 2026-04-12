@@ -208,4 +208,6 @@ Copy `funds.example.csv` to `funds.csv` and add one row per fund. The file requi
 
 The `category` column is used by `fund_table.py` to display a second summary table below the main one. Each row in that table shows the combined value of all funds assigned to that category across the same time periods, with a grand total row at the bottom.
 
+> **Important:** All funds belonging to the same category must be grouped together as consecutive rows in the CSV file. Funds with the same category label that are separated by rows from a different category will not be aggregated correctly.
+
 `funds.csv` is excluded from version control so your personal fund data remains local.
