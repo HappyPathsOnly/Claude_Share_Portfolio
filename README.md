@@ -6,12 +6,13 @@ Initial code is generated with Claude Code.
 
 ## Overview
 
-This project retrieves up-to-date pricing data for investment funds and displays it in four ways:
+This project retrieves up-to-date pricing data for investment funds and displays it in five ways:
 
 - **fund_table.py** — portfolio table showing fund value at previous day, 1 week, 1 month, 6 months, 1 year, and current value, with a total row and a category summary table below
 - **fund_change_table.py** — portfolio table showing percentage change over the same time periods, with gains in green and losses in red
 - **fund_volatility_table.py** — portfolio table showing annualised historical volatility over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped from green (low) through amber to red (high)
 - **fund_drawdown_table.py** — portfolio table showing the maximum peak-to-trough drawdown for each fund over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, with a second table showing the date each trough occurred
+- **fund_correlation_table.py** — N×N Pearson correlation matrix of daily returns between all funds over a 1-year window, heat-mapped by diversification quality
 
 Funds are configured via a simple `funds.csv` file — no code changes needed to add or remove funds.
 
@@ -29,6 +30,9 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 #### Fund Drawdown Table (`fund_drawdown_table.py`)
 ![Fund Drawdown Table Bokeh](images/fund_drawdown_table11_04_2026.jpg)
 
+#### Fund Correlation Table (`fund_correlation_table.py`)
+![Fund Correlation Table Bokeh](images/fund_correlation_tablebokeh12_04_2026.jpg)
+
 ## Project Structure
 
 The project is organised into four layers following a **model/renderer split** — see [Design Pattern](#design-pattern) below.
@@ -41,6 +45,7 @@ The project is organised into four layers following a **model/renderer split** �
 | `fund_change_table.py` | Builds the change table model and launches the percentage change table |
 | `fund_volatility_table.py` | Builds the volatility table model and launches the historical volatility table |
 | `fund_drawdown_table.py` | Builds the drawdown table model and launches the max-drawdown and trough-date tables |
+| `fund_correlation_table.py` | Builds the correlation matrix model and launches the inter-fund correlation table |
 
 ### Model / Business Logic
 
@@ -57,6 +62,7 @@ The project is organised into four layers following a **model/renderer split** �
 | `renderers/fund_value_table_renderer.py` | Abstract `ValueTableRenderer` base class and `ValueTableModel` dataclass |
 | `renderers/fund_volatility_table_renderer.py` | Abstract `VolatilityTableRenderer` base class and `VolatilityTableModel` dataclass |
 | `renderers/fund_drawdown_table_renderer.py` | Abstract `DrawdownTableRenderer` base class and `DrawdownTableModel` dataclass |
+| `renderers/fund_correlation_table_renderer.py` | Abstract `CorrelationTableRenderer` base class and `CorrelationTableModel` dataclass |
 
 ### Renderer Implementations (Matplotlib)
 
@@ -72,6 +78,7 @@ Located in `GUI/Bokeh/`. Each file implements the same renderer interface as its
 | `GUI/Bokeh/fund_value_table_bokeh.py` | `BokehValueTableRenderer` — absolute value table plus category summary table |
 | `GUI/Bokeh/fund_volatility_table_bokeh.py` | `BokehVolatilityTableRenderer` — historical volatility table with heat-map colouring (green < 10 %, amber 10–20 %, red > 20 %) plus category summary table |
 | `GUI/Bokeh/fund_drawdown_table_bokeh.py` | `BokehDrawdownTableRenderer` — max-drawdown table with heat-map colouring (green < 5 %, amber 5–20 %, red > 20 %), plus a second table showing the trough date for each fund and period |
+| `GUI/Bokeh/fund_correlation_table_bokeh.py` | `BokehCorrelationTableRenderer` — N×N Pearson correlation matrix heat-mapped by diversification quality (green < 0.50, amber 0.50–0.79, red ≥ 0.80), with an abbreviation key and colour legend below the table |
 
 ### Configuration
 
@@ -193,6 +200,12 @@ python fund_volatility_table.py
 
 ```bash
 python fund_drawdown_table.py
+```
+
+**Correlation matrix:**
+
+```bash
+python fund_correlation_table.py
 ```
 
 ## Adding Funds
