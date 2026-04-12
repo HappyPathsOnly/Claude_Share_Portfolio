@@ -1,4 +1,4 @@
-funds.csv
+fund_info/funds.csv
 *.pyc
 __pycache__/
 
@@ -10,4 +10,4 @@ tests/e2e/node_modules/
 tests/e2e/playwright-report/
 tests/e2e/test-results/
 
-funds_experiment.csv
+fund_info/funds_experiment.csv

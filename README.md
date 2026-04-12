@@ -77,8 +77,8 @@ Located in `GUI/Bokeh/`. Each file implements the same renderer interface as its
 
 | File | Description |
 |------|-------------|
-| `funds.csv` | Your local fund configuration (not committed to git) |
-| `funds.example.csv` | Example fund configuration for reference |
+| `fund_info/funds.csv` | Your local fund configuration (not committed to git) |
+| `fund_info/funds.example.csv` | Example fund configuration for reference |
 
 ## Design Pattern
 
@@ -197,7 +197,7 @@ python fund_drawdown_table.py
 
 ## Adding Funds
 
-Copy `funds.example.csv` to `funds.csv` and add one row per fund. The file requires the following columns:
+Copy `fund_info/funds.example.csv` to `fund_info/funds.csv` and add one row per fund. The file requires the following columns:
 
 | Column | Description |
 |--------|-------------|
