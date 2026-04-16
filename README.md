@@ -13,6 +13,7 @@ This project retrieves up-to-date pricing data for investment funds and displays
 - **fund_volatility_table.py** — portfolio table showing annualised historical volatility over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped from green (low) through amber to red (high)
 - **fund_drawdown_table.py** — portfolio table showing the maximum peak-to-trough drawdown for each fund over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, with a second table showing the date each trough occurred
 - **fund_correlation_table.py** — N×N Pearson correlation matrix of daily returns between all funds over a 1-year window, heat-mapped by diversification quality
+- **fund_sharpe_table.py** — portfolio table showing the annualised Sharpe ratio for each fund over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped from green (≥ 1.0) through amber (0–1) to red (negative)
 
 Funds are configured via a simple `funds.csv` file — no code changes needed to add or remove funds.
 
@@ -33,6 +34,9 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 #### Fund Correlation Table (`fund_correlation_table.py`)
 ![Fund Correlation Table Bokeh](images/fund_correlation_tablebokeh12_04_2026.jpg)
 
+#### Fund Sharpe Ratio Table (`fund_sharpe_table.py`)
+![Fund Sharpe Ratio Table Bokeh](images/fund_sharpe_table16_04_2026.jpg)
+
 ## Project Structure
 
 The project is organised into four layers following a **model/renderer split** — see [Design Pattern](#design-pattern) below.
@@ -46,6 +50,7 @@ The project is organised into four layers following a **model/renderer split** �
 | `fund_volatility_table.py` | Builds the volatility table model and launches the historical volatility table |
 | `fund_drawdown_table.py` | Builds the drawdown table model and launches the max-drawdown and trough-date tables |
 | `fund_correlation_table.py` | Builds the correlation matrix model and launches the inter-fund correlation table |
+| `fund_sharpe_table.py` | Builds the Sharpe ratio table model and launches the Sharpe ratio table |
 
 ### Model / Business Logic
 
@@ -63,6 +68,7 @@ The project is organised into four layers following a **model/renderer split** �
 | `renderers/fund_volatility_table_renderer.py` | Abstract `VolatilityTableRenderer` base class and `VolatilityTableModel` dataclass |
 | `renderers/fund_drawdown_table_renderer.py` | Abstract `DrawdownTableRenderer` base class and `DrawdownTableModel` dataclass |
 | `renderers/fund_correlation_table_renderer.py` | Abstract `CorrelationTableRenderer` base class and `CorrelationTableModel` dataclass |
+| `renderers/fund_sharpe_table_renderer.py` | Abstract `SharpeTableRenderer` base class and `SharpeTableModel` dataclass |
 
 ### Renderer Implementations (Matplotlib)
 
@@ -79,6 +85,7 @@ Located in `GUI/Bokeh/`. Each file implements the same renderer interface as its
 | `GUI/Bokeh/fund_volatility_table_bokeh.py` | `BokehVolatilityTableRenderer` — historical volatility table with heat-map colouring (green < 10 %, amber 10–20 %, red > 20 %) plus category summary table |
 | `GUI/Bokeh/fund_drawdown_table_bokeh.py` | `BokehDrawdownTableRenderer` — max-drawdown table with heat-map colouring (green < 5 %, amber 5–20 %, red > 20 %), plus a second table showing the trough date for each fund and period |
 | `GUI/Bokeh/fund_correlation_table_bokeh.py` | `BokehCorrelationTableRenderer` — N×N Pearson correlation matrix heat-mapped by diversification quality (green < 0.50, amber 0.50–0.79, red ≥ 0.80), with an abbreviation key and colour legend below the table |
+| `GUI/Bokeh/fund_sharpe_table_bokeh.py` | `BokehSharpeTableRenderer` — Sharpe ratio table heat-mapped by risk-adjusted return (green ≥ 1.0, amber 0–1.0, red < 0), with the risk-free rate shown in the table title |
 
 ### Configuration
 
@@ -206,6 +213,12 @@ python fund_drawdown_table.py
 
 ```bash
 python fund_correlation_table.py
+```
+
+**Sharpe ratio table:**
+
+```bash
+python fund_sharpe_table.py
 ```
 
 ## Adding Funds
