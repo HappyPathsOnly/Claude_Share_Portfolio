@@ -5,6 +5,7 @@ Generates all Bokeh HTML output files without opening a browser:
   fund_volatility_table.html – historical volatility
   fund_drawdown_table.html – max drawdown
   fund_sharpe_table.html   – Sharpe ratio
+  fund_beta_table.html     – beta vs benchmark
 
 Run directly or via the Playwright e2e global setup.
 """
@@ -20,11 +21,13 @@ from fund_change_table import build_table_model as build_change_model
 from fund_volatility_table import build_table_model as build_volatility_model
 from fund_drawdown_table import build_table_model as build_drawdown_model
 from fund_sharpe_table import build_table_model as build_sharpe_model
+from fund_beta_table import build_table_model as build_beta_model
 from GUI.Bokeh.fund_value_table_bokeh import BokehValueTableRenderer
 from GUI.Bokeh.fund_change_table_bokeh import BokehChangeTableRenderer
 from GUI.Bokeh.fund_volatility_table_bokeh import BokehVolatilityTableRenderer
 from GUI.Bokeh.fund_drawdown_table_bokeh import BokehDrawdownTableRenderer
 from GUI.Bokeh.fund_sharpe_table_bokeh import BokehSharpeTableRenderer
+from GUI.Bokeh.fund_beta_table_bokeh import BokehBetaTableRenderer
 
 
 def generate_all() -> None:
@@ -59,6 +62,12 @@ def generate_all() -> None:
     BokehSharpeTableRenderer().render(
         build_sharpe_model(funds),
         output_path=os.path.join(ROOT, "fund_sharpe_table.html"),
+    )
+
+    print("Generating fund_beta_table.html...")
+    BokehBetaTableRenderer().render(
+        build_beta_model(funds),
+        output_path=os.path.join(ROOT, "fund_beta_table.html"),
     )
 
     print("All HTML files generated.")
