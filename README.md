@@ -14,7 +14,7 @@ This project retrieves up-to-date pricing data for investment funds and displays
 - **fund_drawdown_table.py** — portfolio table showing the maximum peak-to-trough drawdown for each fund over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, with a second table showing the date each trough occurred
 - **fund_correlation_table.py** — N×N Pearson correlation matrix of daily returns between all funds over a 1-year window, heat-mapped by diversification quality
 - **fund_sharpe_table.py** — portfolio table showing the annualised Sharpe ratio for each fund over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped from green (≥ 1.0) through amber (0–1) to red (negative)
-- **fund_beta_table.py** — portfolio table showing the beta of each fund relative to the FTSE 100 over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped by market sensitivity (green < 0.8 defensive, amber 0.8–1.2 market-like, red > 1.2 or negative)
+- **fund_beta_table.py** — portfolio table showing the beta of each fund relative to the FTSE All World over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped by market sensitivity (green < 0.8 defensive, amber 0.8–1.2 market-like, red > 1.2 or negative)
 
 Funds are configured via a simple `funds.csv` file — no code changes needed to add or remove funds.
 

@@ -6,6 +6,12 @@ Beta = Covariance(fund returns, benchmark returns) / Variance(benchmark returns)
 
 Daily log returns are used for both the fund and the benchmark.
 The benchmark is fetched once and reused across all funds.
+
+Beta = 1.0 → the fund tends to move in line with the market
+Beta above 1.0 → the fund tends to move more than the market
+Beta below 1.0 → the fund tends to move less than the market
+Negative beta → the fund tends to move in the opposite direction to the market
+
 """
 
 import numpy as np
@@ -18,6 +24,7 @@ from renderers.fund_beta_table_renderer import BetaTableModel, BetaTableRenderer
 
 # ---------------------------------------------------------------------------
 # Benchmark – FTSE 100 (^FTSE) is the natural UK equity benchmark.
+# Benchmark – FTSE All World is the all world equity benchmark.
 # Change BENCHMARK_TICKER / BENCHMARK_NAME if a different index is preferred.
 # ---------------------------------------------------------------------------
 BENCHMARK_TICKER = "VWRL.L"
