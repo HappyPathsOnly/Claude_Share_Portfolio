@@ -73,7 +73,11 @@ def fetch_correlation_matrix(funds: list) -> tuple[list[str], list[str], pandas.
         df = fund_ticker.history(period="1y")
         if df.empty:
             raise ValueError(f"No data returned for ticker {ticker!r}")
-        closes[f["name"]] = df["Close"]
+        series = df["Close"]
+        if series.index.tz:
+            series = series.tz_convert(None)
+        series.index = series.index.normalize()
+        closes[f["name"]] = series
 
     price_df = pandas.DataFrame(closes).dropna()
     returns = price_df.pct_change().dropna()
