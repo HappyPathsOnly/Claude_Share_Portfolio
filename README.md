@@ -15,6 +15,7 @@ This project retrieves up-to-date pricing data for investment funds and displays
 - **fund_correlation_table.py** — N×N Pearson correlation matrix of daily returns between all funds over a 1-year window, heat-mapped by diversification quality
 - **fund_sharpe_table.py** — portfolio table showing the annualised Sharpe ratio for each fund over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped from green (≥ 1.0) through amber (0–1) to red (negative)
 - **fund_beta_table.py** — portfolio table showing the beta of each fund relative to the FTSE All World over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped by market sensitivity (green < 0.8 defensive, amber 0.8–1.2 market-like, red > 1.2 or negative)
+- **fund_alpha_table.py** — portfolio table showing Jensen's Alpha for each fund relative to the FTSE All World over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, with a category summary table below (Alpha > 0 means the fund outperformed its market-exposure prediction)
 
 Funds are configured via a simple `funds.csv` file — no code changes needed to add or remove funds.
 
@@ -41,6 +42,9 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 #### Fund Beta Table (`fund_beta_table.py`)
 ![Fund Beta Table Bokeh](images/fund_beta_table19_04_2026.jpg)
 
+#### Fund Alpha Table (`fund_alpha_table.py`)
+![Fund Alpha Table Bokeh](images/fund_alpha_table21_04_2026.jpg)
+
 ## Project Structure
 
 The project is organised into four layers following a **model/renderer split** — see [Design Pattern](#design-pattern) below.
@@ -56,6 +60,7 @@ The project is organised into four layers following a **model/renderer split** �
 | `fund_correlation_table.py` | Builds the correlation matrix model and launches the inter-fund correlation table |
 | `fund_sharpe_table.py` | Builds the Sharpe ratio table model and launches the Sharpe ratio table |
 | `fund_beta_table.py` | Builds the beta table model and launches the beta vs benchmark table |
+| `fund_alpha_table.py` | Builds the alpha table model and launches the Jensen's Alpha table |
 
 ### Model / Business Logic
 
@@ -75,6 +80,7 @@ The project is organised into four layers following a **model/renderer split** �
 | `renderers/fund_correlation_table_renderer.py` | Abstract `CorrelationTableRenderer` base class and `CorrelationTableModel` dataclass |
 | `renderers/fund_sharpe_table_renderer.py` | Abstract `SharpeTableRenderer` base class and `SharpeTableModel` dataclass |
 | `renderers/fund_beta_table_renderer.py` | Abstract `BetaTableRenderer` base class and `BetaTableModel` dataclass |
+| `renderers/fund_alpha_table_renderer.py` | Abstract `AlphaTableRenderer` base class and `AlphaTableModel` dataclass |
 
 ### Renderer Implementations (Matplotlib)
 
@@ -93,6 +99,7 @@ Located in `GUI/Bokeh/`. Each file implements the same renderer interface as its
 | `GUI/Bokeh/fund_correlation_table_bokeh.py` | `BokehCorrelationTableRenderer` — N×N Pearson correlation matrix heat-mapped by diversification quality (green < 0.50, amber 0.50–0.79, red ≥ 0.80), with an abbreviation key and colour legend below the table |
 | `GUI/Bokeh/fund_sharpe_table_bokeh.py` | `BokehSharpeTableRenderer` — Sharpe ratio table heat-mapped by risk-adjusted return (green ≥ 1.0, amber 0–1.0, red < 0), with the risk-free rate shown in the table title |
 | `GUI/Bokeh/fund_beta_table_bokeh.py` | `BokehBetaTableRenderer` — beta table heat-mapped by market sensitivity (green < 0.8, amber 0.8–1.2, red > 1.2 or negative), with the benchmark shown in the table title |
+| `GUI/Bokeh/fund_alpha_table_bokeh.py` | `BokehAlphaTableRenderer` — Jensen's Alpha table with positive alpha in green and negative alpha in red, plus a category summary table; benchmark and risk-free rate shown in the title |
 
 ### Configuration
 
@@ -232,6 +239,12 @@ python fund_sharpe_table.py
 
 ```bash
 python fund_beta_table.py
+```
+
+**Jensen's Alpha table:**
+
+```bash
+python fund_alpha_table.py
 ```
 
 ## Adding Funds
