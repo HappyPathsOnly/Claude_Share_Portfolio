@@ -47,60 +47,6 @@ Funds are configured via a simple `funds.csv` file — no code changes needed to
 
 ## Project Structure
 
-The project is organised into four layers following a **model/renderer split** — see [Design Pattern](#design-pattern) below.
-
-### Entry Points
-
-| File | Description |
-|------|-------------|
-| `fund_table.py` | Builds the value table model and launches the absolute value table |
-| `fund_change_table.py` | Builds the change table model and launches the percentage change table |
-| `fund_volatility_table.py` | Builds the volatility table model and launches the historical volatility table |
-| `fund_drawdown_table.py` | Builds the drawdown table model and launches the max-drawdown and trough-date tables |
-| `fund_correlation_table.py` | Builds the correlation matrix model and launches the inter-fund correlation table |
-| `fund_sharpe_table.py` | Builds the Sharpe ratio table model and launches the Sharpe ratio table |
-| `fund_beta_table.py` | Builds the beta table model and launches the beta vs benchmark table |
-| `fund_alpha_table.py` | Builds the alpha table model and launches the Jensen's Alpha table |
-
-### Model / Business Logic
-
-| File | Description |
-|------|-------------|
-| `utils/fund_utils.py` | Shared data loading (`load_funds`) and price fetching (`fetch_prices_gbp`) |
-| `utils/fund_constants.py` | Shared styling and layout constants (colours, font sizes, row heights) |
-
-### Renderer Abstractions
-
-| File | Description |
-|------|-------------|
-| `renderers/fund_table_renderer.py` | Abstract `TableRenderer` base class and `TableModel` dataclass |
-| `renderers/fund_value_table_renderer.py` | Abstract `ValueTableRenderer` base class and `ValueTableModel` dataclass |
-| `renderers/fund_volatility_table_renderer.py` | Abstract `VolatilityTableRenderer` base class and `VolatilityTableModel` dataclass |
-| `renderers/fund_drawdown_table_renderer.py` | Abstract `DrawdownTableRenderer` base class and `DrawdownTableModel` dataclass |
-| `renderers/fund_correlation_table_renderer.py` | Abstract `CorrelationTableRenderer` base class and `CorrelationTableModel` dataclass |
-| `renderers/fund_sharpe_table_renderer.py` | Abstract `SharpeTableRenderer` base class and `SharpeTableModel` dataclass |
-| `renderers/fund_beta_table_renderer.py` | Abstract `BetaTableRenderer` base class and `BetaTableModel` dataclass |
-| `renderers/fund_alpha_table_renderer.py` | Abstract `AlphaTableRenderer` base class and `AlphaTableModel` dataclass |
-
-### Renderer Implementations (Matplotlib)
-
-A Matplotlib implementation exists in `GUI/Matplotlib/` but is not documented here.
-
-### Renderer Implementations (Bokeh)
-
-Located in `GUI/Bokeh/`. Each file implements the same renderer interface as its matplotlib counterpart, so the entry points and model-building logic are untouched.
-
-| File | Description |
-|------|-------------|
-| `GUI/Bokeh/fund_change_table_bokeh.py` | `BokehChangeTableRenderer` — percentage change table with green/red colouring on gain/loss cells |
-| `GUI/Bokeh/fund_value_table_bokeh.py` | `BokehValueTableRenderer` — absolute value table plus category summary table |
-| `GUI/Bokeh/fund_volatility_table_bokeh.py` | `BokehVolatilityTableRenderer` — historical volatility table with heat-map colouring (green < 10 %, amber 10–20 %, red > 20 %) plus category summary table |
-| `GUI/Bokeh/fund_drawdown_table_bokeh.py` | `BokehDrawdownTableRenderer` — max-drawdown table with heat-map colouring (green < 5 %, amber 5–20 %, red > 20 %), plus a second table showing the trough date for each fund and period |
-| `GUI/Bokeh/fund_correlation_table_bokeh.py` | `BokehCorrelationTableRenderer` — N×N Pearson correlation matrix heat-mapped by diversification quality (green < 0.50, amber 0.50–0.79, red ≥ 0.80), with an abbreviation key and colour legend below the table |
-| `GUI/Bokeh/fund_sharpe_table_bokeh.py` | `BokehSharpeTableRenderer` — Sharpe ratio table heat-mapped by risk-adjusted return (green ≥ 1.0, amber 0–1.0, red < 0), with the risk-free rate shown in the table title |
-| `GUI/Bokeh/fund_beta_table_bokeh.py` | `BokehBetaTableRenderer` — beta table heat-mapped by market sensitivity (green < 0.8, amber 0.8–1.2, red > 1.2 or negative), with the benchmark shown in the table title |
-| `GUI/Bokeh/fund_alpha_table_bokeh.py` | `BokehAlphaTableRenderer` — Jensen's Alpha table with positive alpha in green and negative alpha in red, plus a category summary table; benchmark and risk-free rate shown in the title |
-
 ### Configuration
 
 | File | Description |
@@ -127,6 +73,10 @@ Each model has a paired abstract base class — `TableRenderer`, `ValueTableRend
 ### 3. Renderer implementations (GUI)
 
 The `GUI/Bokeh/*_bokeh.py` files contain all framework-specific code. They implement the abstract renderer interfaces and are the only place that knows about the GUI framework. Adding a new backend (e.g. a terminal renderer or a web framework) requires only a new implementation file — the models and entry points remain untouched.
+
+### Example: Alpha table
+
+`fund_alpha_table.py` fetches prices, builds an `AlphaTableModel` (pure data — no GUI), and passes it to `BokehAlphaTableRenderer.render()`. The renderer in `GUI/Bokeh/fund_alpha_table_bokeh.py` is the only file that knows about Bokeh. The same model could be passed to a different renderer without touching the entry point or model-building logic.
 
 ### Why this structure?
 
