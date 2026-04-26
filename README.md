@@ -1,49 +1,166 @@
 # Fund Tracker
 
-Fund Tracker is a Python portfolio management tool that visualises your share and fund investments using live data from Yahoo Finance. Configure your holdings once in a CSV file and get instant views of your portfolio's current value, historical snapshots (1 week to 10 years back), and percentage gains/losses. Supports GBp/GBX pence-denominated instruments with automatic currency conversion.
+Fund Tracker is a Python portfolio management tool that visualises your share and fund investments using live data from Yahoo Finance. Configure your holdings once in a CSV file and generate interactive browser-based tables covering current value, percentage change, historical volatility, drawdown, correlation, Sharpe ratio, beta, and alpha.
 
-Initial code is generated with Claude Code. 
+Funds are configured via a simple `funds.csv` file — no code changes are needed to add or remove holdings. Initial code is generated with Claude Code.
 
-## Overview
+## Portfolio Analysis
 
-This project retrieves up-to-date pricing data for investment funds and displays it in seven ways:
+Each view is a standalone script that fetches live pricing data and renders an interactive table in the browser. The sections below describe each view, what it measures, and how to interpret the colour coding.
 
-- **fund_table.py** — portfolio table showing fund value at previous day, 1 week, 1 month, 6 months, 1 year, and current value, with a total row and a category summary table below
-- **fund_change_table.py** — portfolio table showing percentage change over the same time periods, with gains in green and losses in red
-- **fund_volatility_table.py** — portfolio table showing annualised historical volatility over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped from green (low) through amber to red (high)
-- **fund_drawdown_table.py** — portfolio table showing the maximum peak-to-trough drawdown for each fund over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, with a second table showing the date each trough occurred
-- **fund_correlation_table.py** — N×N Pearson correlation matrix of daily returns between all funds over a 1-year window, heat-mapped by diversification quality
-- **fund_sharpe_table.py** — portfolio table showing the annualised Sharpe ratio for each fund over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped from green (≥ 1.0) through amber (0–1) to red (negative)
-- **fund_beta_table.py** — portfolio table showing the beta of each fund relative to the FTSE All World over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, heat-mapped by market sensitivity (green < 0.8 defensive, amber 0.8–1.2 market-like, red > 1.2 or negative)
-- **fund_alpha_table.py** — portfolio table showing Jensen's Alpha for each fund relative to the FTSE All World over 1M, 3M, 6M, 1Y, 3Y and 5Y windows, with a category summary table below (Alpha > 0 means the fund outperformed its market-exposure prediction)
+---
 
-Funds are configured via a simple `funds.csv` file — no code changes needed to add or remove funds.
+### Fund Value
 
-## Screenshots
+#### What is it?
 
-#### Fund Value Table (`fund_table.py`)
-![Fund Table Bokeh](images/fund_table_bokeh05_04_2026.jpg)
+The fund value table shows the absolute value (in GBP) of each holding across a series of historical snapshots: 1 year ago, 6 months ago, 1 month ago, 1 week ago, the previous day's close, and the current value. A total row summarises the whole portfolio, and a second summary table groups holdings by category.
 
-#### Fund Change Table (`fund_change_table.py`)
-![Fund Change Table Bokeh](images/fund_change_table_bokeh05_04_2026.jpg)
+#### Screenshot
 
-#### Fund Volatility Table (`fund_volatility_table.py`)
-![Fund Volatility Table Bokeh](images/fund_volatility_table_bokeh09_04_2026.jpg)
+![Fund Value Table](images/fund_table_bokeh05_04_2026.jpg)
 
-#### Fund Drawdown Table (`fund_drawdown_table.py`)
-![Fund Drawdown Table Bokeh](images/fund_drawdown_table11_04_2026.jpg)
+#### Reading the table
 
-#### Fund Correlation Table (`fund_correlation_table.py`)
-![Fund Correlation Table Bokeh](images/fund_correlation_tablebokeh12_04_2026.jpg)
+- **Fund rows** — each row shows a single fund's value at each time point
+- **Total row** — bold blue text; the sum of all holdings at each time point
+- **By Category table** — groups funds by their assigned category, with a grand total row
 
-#### Fund Sharpe Ratio Table (`fund_sharpe_table.py`)
-![Fund Sharpe Ratio Table Bokeh](images/fund_sharpe_table16_04_2026.jpg)
+No colour coding is applied to value figures.
 
-#### Fund Beta Table (`fund_beta_table.py`)
-![Fund Beta Table Bokeh](images/fund_beta_table19_04_2026.jpg)
+---
 
-#### Fund Alpha Table (`fund_alpha_table.py`)
-![Fund Alpha Table Bokeh](images/fund_alpha_table21_04_2026.jpg)
+### Fund Change
+
+#### What is it?
+
+The percentage change table shows how much each fund has gained or lost relative to the same historical snapshots used in the value table. This makes it straightforward to compare relative performance across funds and time horizons at a glance.
+
+#### Screenshot
+
+![Fund Change Table](images/fund_change_table_bokeh05_04_2026.jpg)
+
+#### Reading the table
+
+- **Green** — positive change (gain)
+- **Red** — negative change (loss)
+- The rightmost column shows the current absolute value for reference
+
+---
+
+### Fund Volatility
+
+#### What is it?
+
+Historical volatility (annualised) measures how much a fund's daily returns have fluctuated over a given period. Higher volatility means larger price swings — both up and down — and is commonly used as a proxy for risk. The table covers 1M, 3M, 6M, 1Y, 3Y and 5Y windows.
+
+#### Screenshot
+
+![Fund Volatility Table](images/fund_volatility_table_bokeh09_04_2026.jpg)
+
+#### Reading the table
+
+- **Green** — low volatility; the fund has been relatively stable
+- **Amber/orange** — moderate volatility
+- **Red** — high volatility; the fund has experienced large price swings
+- A portfolio average row and a by-category summary table are shown below the main table
+
+---
+
+### Fund Drawdown
+
+#### What is it?
+
+Maximum drawdown measures the largest peak-to-trough decline a fund suffered during a given period, expressed as a percentage. It captures the worst-case loss an investor would have experienced if they bought at the peak and sold at the trough. The table covers 1M, 3M, 6M, 1Y, 3Y and 5Y windows.
+
+#### Screenshot
+
+![Fund Drawdown Table](images/fund_drawdown_table11_04_2026.jpg)
+
+#### Reading the table
+
+- **Green** — small drawdown; limited peak-to-trough loss
+- **Amber/orange** — moderate drawdown
+- **Red** — large drawdown
+- A second table below shows the date each trough occurred for every fund and time window; no colour coding is applied to dates
+
+---
+
+### Correlation
+
+#### What is it?
+
+The correlation matrix shows the Pearson correlation coefficient of daily returns between every pair of funds over a 1-year window. A value of 1.00 means two funds move in perfect lockstep; a value near 0 means they move independently; a negative value means they tend to move in opposite directions. Low correlation between funds improves portfolio diversification.
+
+#### Screenshot
+
+![Fund Correlation Table](images/fund_correlation_tablebokeh12_04_2026.jpg)
+
+#### Reading the table
+
+- **Grey — 1.00** — self-correlation along the diagonal; every fund perfectly correlates with itself
+- **Red — ≥ 0.80** — highly correlated; these funds move together, offering poor diversification
+- **Amber/orange — 0.50 to 0.79** — moderate correlation
+- **Green — < 0.50** — low correlation; these funds move more independently, supporting good diversification
+- An abbreviation key below the matrix maps column headers to full fund names
+
+---
+
+### Sharpe Ratio
+
+#### What is it?
+
+The Sharpe ratio measures risk-adjusted return: how much excess return a fund generates per unit of volatility, relative to the risk-free rate (UK Base Rate). A higher Sharpe ratio indicates better return per unit of risk taken. The table covers 1M, 3M, 6M, 1Y, 3Y and 5Y windows.
+
+#### Screenshot
+
+![Fund Sharpe Ratio Table](images/fund_sharpe_table16_04_2026.jpg)
+
+#### Reading the table
+
+- **Green — ≥ 1.0** — strong risk-adjusted return
+- **Amber/orange — 0 to 0.99** — moderate risk-adjusted return
+- **Red — negative** — the fund returned less than the risk-free rate over that period
+- A by-category summary table is shown below the main table
+
+---
+
+### Beta
+
+#### What is it?
+
+Beta measures how sensitive a fund is to movements in the broader market, benchmarked against the FTSE All-World. A beta of 1.0 means the fund moves in line with the market; below 1.0 is more defensive; above 1.0 is more aggressive. The table covers 1M, 3M, 6M, 1Y, 3Y and 5Y windows.
+
+#### Screenshot
+
+![Fund Beta Table](images/fund_beta_table19_04_2026.jpg)
+
+#### Reading the table
+
+- **Green — < 0.8** — defensive; the fund is less sensitive to market swings
+- **Amber/orange — 0.8 to 1.2** — market-like; the fund broadly tracks the market
+- **Red — > 1.2 or negative** — aggressive or inverse; the fund amplifies market moves, or moves against them
+- A by-category summary table is shown below the main table
+
+---
+
+### Alpha
+
+#### What is it?
+
+Jensen's Alpha measures the return a fund delivered above or below what its level of market exposure would predict, relative to the FTSE All-World and the UK Base Rate. A positive alpha means the fund outperformed its market-risk-adjusted expectation; negative alpha means it underperformed. The table covers 1M, 3M, 6M, 1Y, 3Y and 5Y windows.
+
+#### Screenshot
+
+![Fund Alpha Table](images/fund_alpha_table21_04_2026.jpg)
+
+#### Reading the table
+
+- **Green** — positive alpha; the fund outperformed its market-adjusted benchmark
+- **Red** — negative alpha; the fund underperformed its market-adjusted benchmark
+- A by-category summary table is shown below the main table
+
+---
 
 ## Project Structure
 
