@@ -28,6 +28,12 @@ The fund value table shows the absolute value (in GBP) of each holding across a 
 
 No colour coding is applied to value figures.
 
+#### Running
+
+```bash
+python fund_table.py
+```
+
 ---
 
 ### Fund Change
@@ -45,6 +51,12 @@ The percentage change table shows how much each fund has gained or lost relative
 - **Green** — positive change (gain)
 - **Red** — negative change (loss)
 - The rightmost column shows the current absolute value for reference
+
+#### Running
+
+```bash
+python fund_change_table.py
+```
 
 ---
 
@@ -65,6 +77,12 @@ Historical volatility (annualised) measures how much a fund's daily returns have
 - **Red** — high volatility; the fund has experienced large price swings
 - A portfolio average row and a by-category summary table are shown below the main table
 
+#### Running
+
+```bash
+python fund_volatility_table.py
+```
+
 ---
 
 ### Fund Drawdown
@@ -83,6 +101,12 @@ Maximum drawdown measures the largest peak-to-trough decline a fund suffered dur
 - **Amber/orange** — moderate drawdown
 - **Red** — large drawdown
 - A second table below shows the date each trough occurred for every fund and time window; no colour coding is applied to dates
+
+#### Running
+
+```bash
+python fund_drawdown_table.py
+```
 
 ---
 
@@ -104,6 +128,12 @@ The correlation matrix shows the Pearson correlation coefficient of daily return
 - **Green — < 0.50** — low correlation; these funds move more independently, supporting good diversification
 - An abbreviation key below the matrix maps column headers to full fund names
 
+#### Running
+
+```bash
+python fund_correlation_table.py
+```
+
 ---
 
 ### Sharpe Ratio
@@ -122,6 +152,12 @@ The Sharpe ratio measures risk-adjusted return: how much excess return a fund ge
 - **Amber/orange — 0 to 0.99** — moderate risk-adjusted return
 - **Red — negative** — the fund returned less than the risk-free rate over that period
 - A by-category summary table is shown below the main table
+
+#### Running
+
+```bash
+python fund_sharpe_table.py
+```
 
 ---
 
@@ -142,6 +178,12 @@ Beta measures how sensitive a fund is to movements in the broader market, benchm
 - **Red — > 1.2 or negative** — aggressive or inverse; the fund amplifies market moves, or moves against them
 - A by-category summary table is shown below the main table
 
+#### Running
+
+```bash
+python fund_beta_table.py
+```
+
 ---
 
 ### Alpha
@@ -159,6 +201,12 @@ Jensen's Alpha measures the return a fund delivered above or below what its leve
 - **Green** — positive alpha; the fund outperformed its market-adjusted benchmark
 - **Red** — negative alpha; the fund underperformed its market-adjusted benchmark
 - A by-category summary table is shown below the main table
+
+#### Running
+
+```bash
+python fund_alpha_table.py
+```
 
 ---
 
@@ -260,58 +308,6 @@ Install dependencies:
 
 ```bash
 pip install -r requirements.txt
-```
-
-### Running
-
-Each entry point defaults to the Bokeh renderer (opens in the browser). Pass `--matplotlib` to use the Matplotlib renderer instead.
-
-**Absolute value table:**
-
-```bash
-python fund_table.py
-```
-
-**Percentage change table:**
-
-```bash
-python fund_change_table.py
-```
-
-**Historical volatility table:**
-
-```bash
-python fund_volatility_table.py
-```
-
-**Max-drawdown table:**
-
-```bash
-python fund_drawdown_table.py
-```
-
-**Correlation matrix:**
-
-```bash
-python fund_correlation_table.py
-```
-
-**Sharpe ratio table:**
-
-```bash
-python fund_sharpe_table.py
-```
-
-**Beta table:**
-
-```bash
-python fund_beta_table.py
-```
-
-**Jensen's Alpha table:**
-
-```bash
-python fund_alpha_table.py
 ```
 
 ## Adding Funds
